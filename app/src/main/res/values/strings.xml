@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ForkNews</string>
+    <string name="add_repository">Добавить репозиторий</string>
+    <string name="new_release">Новый релиз</string>
+    <string name="notifications">Уведомления</string>
+    <string name="check_interval">Частота проверки</string>
+    <string name="custom_time">Пользовательское время</string>
+    <string name="select_time">Выбрать время</string>
+    <string name="theme">Тема</string>
+    <string name="use_system_theme">Использовать системную тему</string>
+    <string name="dark_theme">Темная тема</string>
+    <string name="enable_notifications">Включить уведомления</string>
+    <string name="settings">Настройки</string>
+</resources>

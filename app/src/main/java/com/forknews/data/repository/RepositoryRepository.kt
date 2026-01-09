@@ -1,0 +1,88 @@
+package com.forknews.data.repository
+
+import com.forknews.data.local.RepositoryDao
+import com.forknews.data.model.Repository
+import com.forknews.data.model.RepositoryType
+import com.forknews.data.remote.GameHubService
+import com.forknews.data.remote.RetrofitClient
+import kotlinx.coroutines.flow.Flow
+
+class RepositoryRepository(
+    private val repositoryDao: RepositoryDao
+) {
+    private val githubApi = RetrofitClient.githubApi
+    private val gameHubService = GameHubService()
+    
+    val allRepositories: Flow<List<Repository>> = repositoryDao.getAllRepositories()
+    
+    suspend fun addRepository(repository: Repository): Long {
+        return repositoryDao.insertRepository(repository)
+    }
+    
+    suspend fun updateRepository(repository: Repository) {
+        repositoryDao.updateRepository(repository)
+    }
+    
+    suspend fun deleteRepository(repository: Repository) {
+        repositoryDao.deleteRepository(repository)
+    }
+    
+    suspend fun markReleaseAsViewed(id: Long) {
+        repositoryDao.markReleaseAsViewed(id)
+    }
+    
+    suspend fun checkForUpdates(repository: Repository): Boolean {
+        return when (repository.type) {
+            RepositoryType.GITHUB -> checkGitHubUpdate(repository)
+            RepositoryType.GAMEHUB -> checkGameHubUpdate(repository)
+        }
+    }
+    
+    private suspend fun checkGitHubUpdate(repository: Repository): Boolean {
+        return try {
+            val response = githubApi.getLatestRelease(repository.owner, repository.name)
+            if (response.isSuccessful) {
+                val release = response.body()
+                if (release != null) {
+                    val newRelease = release.tag_name
+                    if (newRelease != repository.latestRelease) {
+                        repositoryDao.updateRelease(
+                            repository.id,
+                            newRelease,
+                            release.html_url,
+                            System.currentTimeMillis()
+                        )
+                        return true
+                    }
+                }
+            }
+            false
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+    
+    private suspend fun checkGameHubUpdate(repository: Repository): Boolean {
+        return try {
+            val newApkName = gameHubService.getLatestApkName()
+            if (newApkName != null && newApkName != repository.latestRelease) {
+                repositoryDao.updateRelease(
+                    repository.id,
+                    newApkName,
+                    "https://gamehub.xiaoji.com/download/",
+                    System.currentTimeMillis()
+                )
+                return true
+            }
+            false
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+    
+    suspend fun getRepositoriesWithNotifications(): List<Repository> {
+        return repositoryDao.getRepositoriesWithNotifications()
+    }
+}
