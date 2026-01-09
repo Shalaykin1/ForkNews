@@ -156,19 +156,20 @@ class SettingsActivity : AppCompatActivity() {
             // Load check interval
             val checkInterval = PreferencesManager.getCheckInterval().first()
             val position = when (checkInterval) {
-                30L -> 0
-                60L -> 1
-                120L -> 2
-                360L -> 3
-                720L -> 4
-                else -> 1
+                1L -> 0
+                30L -> 1
+                60L -> 2
+                120L -> 3
+                360L -> 4
+                720L -> 5
+                else -> 0
             }
             binding.spinnerCheckInterval.setSelection(position)
             
             // Load custom time
             val customTimeEnabled = PreferencesManager.getCustomTimeEnabled().first()
             if (customTimeEnabled) {
-                binding.spinnerCheckInterval.setSelection(5)
+                binding.spinnerCheckInterval.setSelection(6)
                 binding.layoutCustomTime.visibility = android.view.View.VISIBLE
                 val hour = PreferencesManager.getCustomTimeHour().first()
                 val minute = PreferencesManager.getCustomTimeMinute().first()

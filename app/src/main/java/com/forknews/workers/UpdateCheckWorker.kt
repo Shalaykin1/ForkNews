@@ -105,7 +105,10 @@ class UpdateCheckWorker(
                 applicationContext,
                 AppDatabase::class.java,
                 "forknews_database"
-            ).build()
+            )
+                .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3)
+                .fallbackToDestructiveMigration()
+                .build()
             
             val repository = RepositoryRepository(database.repositoryDao())
             val repos = repository.getRepositoriesWithNotifications()

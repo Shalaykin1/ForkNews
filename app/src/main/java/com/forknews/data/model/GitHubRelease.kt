@@ -6,5 +6,6 @@ data class GitHubRelease(
     val name: String?,
     val html_url: String,
     val published_at: String,
-    val body: String?
+    val body: String?,
+    val prerelease: Boolean = false
 )

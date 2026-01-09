@@ -38,7 +38,30 @@ class RepositoryAdapter(
                     repository.name
                 }
                 
-                tvLatestRelease.text = repository.latestRelease ?: "Нет релизов"
+                // Отображаем название релиза + версию
+                tvLatestRelease.text = if (repository.latestRelease != null) {
+                    if (repository.releaseName != null && repository.releaseName != repository.latestRelease) {
+                        "${repository.releaseName} (${repository.latestRelease})"
+                    } else {
+                        repository.latestRelease
+                    }
+                } else {
+                    "Нет релизов"
+                }
+                
+                // Отображаем тип релиза с цветом
+                if (repository.latestRelease != null) {
+                    tvReleaseType.visibility = android.view.View.VISIBLE
+                    if (repository.isPrerelease) {
+                        tvReleaseType.text = "Pre-release"
+                        tvReleaseType.setTextColor(android.graphics.Color.parseColor("#D2691E")) // Терракотовый
+                    } else {
+                        tvReleaseType.text = "Latest"
+                        tvReleaseType.setTextColor(android.graphics.Color.parseColor("#4CAF50")) // Зеленый
+                    }
+                } else {
+                    tvReleaseType.visibility = android.view.View.GONE
+                }
                 
                 ivNewBadge.visibility = if (repository.hasNewRelease) {
                     android.view.View.VISIBLE

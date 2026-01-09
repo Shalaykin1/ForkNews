@@ -52,7 +52,10 @@ class MainActivity : AppCompatActivity() {
             applicationContext,
             AppDatabase::class.java,
             "forknews_database"
-        ).build()
+        )
+            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3)
+            .fallbackToDestructiveMigration()
+            .build()
         val repository = RepositoryRepository(database.repositoryDao())
         MainViewModelFactory(repository)
     }
@@ -162,14 +165,11 @@ class MainActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         adapter = RepositoryAdapter(
             onItemClick = { repository ->
-                val url = if (repository.type == com.forknews.data.model.RepositoryType.GAMEHUB) {
-                    repository.url
-                } else {
-                    repository.latestReleaseUrl
-                }
-                url?.let {
+                if (repository.latestReleaseUrl != null) {
                     viewModel.markReleaseAsViewed(repository.id)
-                    openUrl(it)
+                    openUrl(repository.latestReleaseUrl)
+                } else {
+                    Toast.makeText(this, "Релиз еще не загружен", Toast.LENGTH_SHORT).show()
                 }
             },
             onDelete = { }
@@ -233,20 +233,7 @@ class MainActivity : AppCompatActivity() {
     }
     
     private fun showAddRepositoryDialog() {
-        val options = arrayOf("GitHub репозиторий", "GameHub")
-        
-        MaterialAlertDialogBuilder(this)
-            .setTitle("Добавить")
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> showGitHubUrlDialog()
-                    1 -> {
-                        viewModel.addGameHub()
-                        Toast.makeText(this, "GameHub добавлен", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-            .show()
+        showGitHubUrlDialog()
     }
     
     private fun showGitHubUrlDialog() {
@@ -277,12 +264,12 @@ class MainActivity : AppCompatActivity() {
     }
     
     private fun initDefaultRepositoriesIfNeeded() {
-        val prefs = getSharedPreferences("forknews_prefs", MODE_PRIVATE)
-        if (prefs.getBoolean("needs_init", false)) {
-            lifecycleScope.launch {
-                try {
-                    val existingRepos = viewModel.repository.getAllRepositoriesList()
-                    
+        lifecycleScope.launch {
+            try {
+                val existingRepos = viewModel.repository.getAllRepositoriesList()
+                
+                // Если репозиториев меньше 4, добавляем недостающие
+                if (existingRepos.size < 4) {
                     // Список репозиториев для добавления
                     val defaultRepos = listOf(
                         com.forknews.data.model.Repository(
@@ -307,35 +294,30 @@ class MainActivity : AppCompatActivity() {
                             notificationsEnabled = true
                         ),
                         com.forknews.data.model.Repository(
-                            name = "GameHub",
-                            owner = "",
-                            url = "https://gamehub.xiaoji.com/download/",
-                            type = com.forknews.data.model.RepositoryType.GAMEHUB,
+                            name = "winlator",
+                            owner = "brunodev85",
+                            url = "https://github.com/brunodev85/winlator",
+                            type = com.forknews.data.model.RepositoryType.GITHUB,
                             notificationsEnabled = true
                         )
                     )
                     
                     // Добавляем только те репозитории, которых еще нет
+                    // И СРАЗУ загружаем релизы для каждого (синхронно)
                     for (repo in defaultRepos) {
                         val exists = existingRepos.any { it.url == repo.url }
                         if (!exists) {
                             val repoId = viewModel.repository.addRepository(repo)
-                            // Сразу проверяем релизы для нового репозитория
+                            // ВАЖНО: Синхронно загружаем релиз для каждого репозитория
                             val addedRepo = viewModel.repository.getRepositoryById(repoId)
                             if (addedRepo != null) {
                                 viewModel.repository.checkForUpdates(addedRepo)
                             }
                         }
                     }
-                    
-                    // Отмечаем, что инициализация выполнена
-                    prefs.edit()
-                        .remove("needs_init")
-                        .putBoolean("default_repos_initialized", true)
-                        .apply()
-                } catch (e: Exception) {
-                    e.printStackTrace()
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }

@@ -30,9 +30,9 @@ interface RepositoryDao {
     @Query("UPDATE repositories SET hasNewRelease = 0 WHERE id = :id")
     suspend fun markReleaseAsViewed(id: Long)
     
-    @Query("UPDATE repositories SET latestRelease = :release, latestReleaseUrl = :url, hasNewRelease = 1, lastChecked = :timestamp WHERE id = :id")
-    suspend fun updateRelease(id: Long, release: String, url: String, timestamp: Long)
+    @Query("UPDATE repositories SET latestRelease = :release, latestReleaseUrl = :url, releaseName = :releaseName, hasNewRelease = 1, lastChecked = :timestamp, isPrerelease = :isPrerelease WHERE id = :id")
+    suspend fun updateRelease(id: Long, release: String, url: String, releaseName: String?, timestamp: Long, isPrerelease: Boolean)
     
-    @Query("UPDATE repositories SET latestRelease = :release, latestReleaseUrl = :url, hasNewRelease = 0, lastChecked = :timestamp WHERE id = :id")
-    suspend fun updateReleaseWithoutNotification(id: Long, release: String, url: String, timestamp: Long)
+    @Query("UPDATE repositories SET latestRelease = :release, latestReleaseUrl = :url, releaseName = :releaseName, hasNewRelease = 0, lastChecked = :timestamp, isPrerelease = :isPrerelease WHERE id = :id")
+    suspend fun updateReleaseWithoutNotification(id: Long, release: String, url: String, releaseName: String?, timestamp: Long, isPrerelease: Boolean)
 }

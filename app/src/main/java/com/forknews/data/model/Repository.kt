@@ -12,13 +12,14 @@ data class Repository(
     val url: String,
     val latestRelease: String? = null,
     val latestReleaseUrl: String? = null,
+    val releaseName: String? = null,
     val hasNewRelease: Boolean = false,
     val notificationsEnabled: Boolean = true,
     val type: RepositoryType = RepositoryType.GITHUB,
-    val lastChecked: Long = 0
+    val lastChecked: Long = 0,
+    val isPrerelease: Boolean = false
 )
 
 enum class RepositoryType {
-    GITHUB,
-    GAMEHUB
+    GITHUB
 }

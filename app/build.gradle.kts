@@ -12,10 +12,19 @@ android {
         applicationId = "com.forknews"
         minSdk = 33  // Android 13
         targetSdk = 34
-        versionCode = 9
-        versionName = "1.2.1"
+        versionCode = 19
+        versionName = "1.5.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("../keystore.jks")
+            storePassword = "forknews123"
+            keyAlias = "forknewskey"
+            keyPassword = "forknews123"
+        }
     }
 
     buildTypes {
@@ -25,6 +34,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     
@@ -80,9 +90,6 @@ dependencies {
     
     // DataStore Preferences
     implementation("androidx.datastore:datastore-preferences:1.0.0")
-    
-    // Jsoup for HTML parsing (for Gamehub)
-    implementation("org.jsoup:jsoup:1.17.1")
     
     // Testing
     testImplementation("junit:junit:4.13.2")

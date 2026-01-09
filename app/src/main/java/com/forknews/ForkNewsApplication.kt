@@ -16,21 +16,9 @@ class ForkNewsApplication : Application() {
         // Apply saved theme
         PreferencesManager.applyTheme()
         
-        // Mark that we need to initialize default repos
-        // This will be done in MainActivity to avoid database instance issues
-        markNeedsDefaultReposInit()
-        
         // Initialize WorkManager
         initWorkManager()
-    }
-    
-    private fun markNeedsDefaultReposInit() {
-        val prefs = getSharedPreferences("forknews_prefs", Context.MODE_PRIVATE)
-        if (!prefs.contains("default_repos_initialized")) {
-            prefs.edit().putBoolean("needs_init", true).apply()
-        }
-    }
-    
+    }    
 
     
     private fun initWorkManager() {

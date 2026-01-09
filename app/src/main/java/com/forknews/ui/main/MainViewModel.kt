@@ -38,23 +38,6 @@ class MainViewModel(
         }
     }
     
-    fun addGameHub() {
-        viewModelScope.launch {
-            val gameHub = Repository(
-                name = "GameHub",
-                owner = "",
-                url = "https://gamehub.xiaoji.com/download/",
-                type = RepositoryType.GAMEHUB,
-                notificationsEnabled = true
-            )
-            val repoId = repository.addRepository(gameHub)
-            // Сразу проверяем APK после добавления GameHub
-            val addedRepo = repository.getRepositoryById(repoId)
-            if (addedRepo != null) {
-                repository.checkForUpdates(addedRepo)
-            }
-        }
-    }
     
     fun deleteRepository(repo: Repository) {
         viewModelScope.launch {
