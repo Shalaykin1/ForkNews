@@ -10,7 +10,6 @@ import com.forknews.databinding.ItemRepositoryBinding
 
 class RepositoryAdapter(
     private val onItemClick: (Repository) -> Unit,
-    private val onNotificationToggle: (Repository) -> Unit,
     private val onDelete: (Repository) -> Unit
 ) : ListAdapter<Repository, RepositoryAdapter.RepositoryViewHolder>(RepositoryDiffCallback()) {
     
@@ -45,11 +44,6 @@ class RepositoryAdapter(
                     android.view.View.VISIBLE
                 } else {
                     android.view.View.GONE
-                }
-                
-                switchNotifications.isChecked = repository.notificationsEnabled
-                switchNotifications.setOnCheckedChangeListener { _, _ ->
-                    onNotificationToggle(repository)
                 }
                 
                 root.setOnClickListener {

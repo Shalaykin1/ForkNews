@@ -169,9 +169,6 @@ class MainActivity : AppCompatActivity() {
                     openUrl(it)
                 }
             },
-            onNotificationToggle = { repository ->
-                viewModel.toggleNotifications(repository)
-            },
             onDelete = { }
         )
         

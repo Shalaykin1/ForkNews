@@ -50,15 +50,6 @@
             app:layout_constraintTop_toBottomOf="@+id/tvRepoName"
             tools:text="v1.0.0" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switchNotifications"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/notifications"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvLatestRelease" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>
