@@ -32,4 +32,7 @@ interface RepositoryDao {
     
     @Query("UPDATE repositories SET latestRelease = :release, latestReleaseUrl = :url, hasNewRelease = 1, lastChecked = :timestamp WHERE id = :id")
     suspend fun updateRelease(id: Long, release: String, url: String, timestamp: Long)
+    
+    @Query("UPDATE repositories SET latestRelease = :release, latestReleaseUrl = :url, hasNewRelease = 0, lastChecked = :timestamp WHERE id = :id")
+    suspend fun updateReleaseWithoutNotification(id: Long, release: String, url: String, timestamp: Long)
 }

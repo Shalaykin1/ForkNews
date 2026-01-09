@@ -53,6 +53,19 @@ class RepositoryRepository(
                 val release = response.body()
                 if (release != null) {
                     val newRelease = release.tag_name
+                    
+                    // Если это первая проверка (latestRelease == null), сохраняем релиз без флага обновления
+                    if (repository.latestRelease == null) {
+                        repositoryDao.updateReleaseWithoutNotification(
+                            repository.id,
+                            newRelease,
+                            release.html_url,
+                            System.currentTimeMillis()
+                        )
+                        return false // Не показываем как "новое обновление"
+                    }
+                    
+                    // Если релиз изменился, помечаем как новое обновление
                     if (newRelease != repository.latestRelease) {
                         repositoryDao.updateRelease(
                             repository.id,
@@ -74,14 +87,28 @@ class RepositoryRepository(
     private suspend fun checkGameHubUpdate(repository: Repository): Boolean {
         return try {
             val newApkName = gameHubService.getLatestApkName()
-            if (newApkName != null && newApkName != repository.latestRelease) {
-                repositoryDao.updateRelease(
-                    repository.id,
-                    newApkName,
-                    "https://gamehub.xiaoji.com/download/",
-                    System.currentTimeMillis()
-                )
-                return true
+            if (newApkName != null) {
+                // Если это первая проверка (latestRelease == null), сохраняем релиз без флага обновления
+                if (repository.latestRelease == null) {
+                    repositoryDao.updateReleaseWithoutNotification(
+                        repository.id,
+                        newApkName,
+                        "https://gamehub.xiaoji.com/download/",
+                        System.currentTimeMillis()
+                    )
+                    return false // Не показываем как "новое обновление"
+                }
+                
+                // Если APK изменился, помечаем как новое обновление
+                if (newApkName != repository.latestRelease) {
+                    repositoryDao.updateRelease(
+                        repository.id,
+                        newApkName,
+                        "https://gamehub.xiaoji.com/download/",
+                        System.currentTimeMillis()
+                    )
+                    return true
+                }
             }
             false
         } catch (e: Exception) {
