@@ -6,6 +6,8 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.Menu
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -32,6 +34,8 @@ class MainActivity : AppCompatActivity() {
     
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: RepositoryAdapter
+    private val handler = Handler(Looper.getMainLooper())
+    private var autoRefreshRunnable: Runnable? = null
     
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -68,6 +72,37 @@ class MainActivity : AppCompatActivity() {
         setupSwipeRefresh()
         observeData()
         requestNotificationPermission()
+        
+        // Обновить репозитории при запуске
+        viewModel.refreshAll()
+    }
+    
+    override fun onResume() {
+        super.onResume()
+        // Запустить автообновление каждые 60 секунд когда приложение открыто
+        startAutoRefresh()
+    }
+    
+    override fun onPause() {
+        super.onPause()
+        // Остановить автообновление когда приложение свернуто
+        stopAutoRefresh()
+    }
+    
+    private fun startAutoRefresh() {
+        stopAutoRefresh() // Остановить предыдущий, если был
+        autoRefreshRunnable = object : Runnable {
+            override fun run() {
+                viewModel.refreshAll()
+                handler.postDelayed(this, 60_000) // 60 секунд
+            }
+        }
+        handler.postDelayed(autoRefreshRunnable!!, 60_000)
+    }
+    
+    private fun stopAutoRefresh() {
+        autoRefreshRunnable?.let { handler.removeCallbacks(it) }
+        autoRefreshRunnable = null
     }
     
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

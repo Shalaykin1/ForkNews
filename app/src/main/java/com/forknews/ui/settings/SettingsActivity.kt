@@ -41,6 +41,7 @@ class SettingsActivity : AppCompatActivity() {
     
     private fun setupCheckInterval() {
         val intervals = arrayOf(
+            "1 минута",
             "30 минут",
             "1 час",
             "2 часа",
@@ -63,12 +64,13 @@ class SettingsActivity : AppCompatActivity() {
                 ) {
                     lifecycleScope.launch {
                         val minutes = when (position) {
-                            0 -> 30L
-                            1 -> 60L
-                            2 -> 120L
-                            3 -> 360L
-                            4 -> 720L
-                            5 -> {
+                            0 -> 1L
+                            1 -> 30L
+                            2 -> 60L
+                            3 -> 120L
+                            4 -> 360L
+                            5 -> 720L
+                            6 -> {
                                 binding.layoutCustomTime.visibility = android.view.View.VISIBLE
                                 PreferencesManager.setCustomTimeEnabled(true)
                                 -1L
@@ -76,7 +78,7 @@ class SettingsActivity : AppCompatActivity() {
                             else -> 60L
                         }
                         
-                        if (position != 5) {
+                        if (position != 6) {
                             binding.layoutCustomTime.visibility = android.view.View.GONE
                             PreferencesManager.setCustomTimeEnabled(false)
                         }
