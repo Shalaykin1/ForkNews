@@ -41,4 +41,6 @@
     <color name="md_theme_dark_onBackground">#E1E3DF</color>
     <color name="md_theme_dark_surface">#191C1A</color>
     <color name="md_theme_dark_onSurface">#E1E3DF</color>
+    
+    <color name="ic_launcher_background">#006C4C</color>
 </resources>

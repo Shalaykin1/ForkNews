@@ -44,3 +44,6 @@ local.properties
 .Trashes
 ehthumbs.db
 Thumbs.db
+forknews.keystore
+local.properties
+*.apk
