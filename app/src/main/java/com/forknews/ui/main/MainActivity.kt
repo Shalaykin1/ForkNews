@@ -1,12 +1,18 @@
 package com.forknews.ui.main
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.view.Menu
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,6 +32,16 @@ class MainActivity : AppCompatActivity() {
     
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: RepositoryAdapter
+    
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            Toast.makeText(this, "Уведомления разрешены", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "Уведомления отключены", Toast.LENGTH_SHORT).show()
+        }
+    }
     
     private val viewModel: MainViewModel by viewModels {
         val database = Room.databaseBuilder(
@@ -52,19 +68,54 @@ class MainActivity : AppCompatActivity() {
         setupFab()
         setupSwipeRefresh()
         observeData()
+        requestNotificationPermission()
+    }
+    
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+    
+    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                startActivity(Intent(this, SettingsActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+    
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            when {
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    // Permission already granted
+                }
+                shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
+                    // Show rationale and request permission
+                    MaterialAlertDialogBuilder(this)
+                        .setTitle("Разрешение на уведомления")
+                        .setMessage("ForkNews нужны уведомления для информирования о новых релизах")
+                        .setPositiveButton("Разрешить") { _, _ ->
+                            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        }
+                        .setNegativeButton("Отмена", null)
+                        .show()
+                }
+                else -> {
+                    // Request permission directly
+                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+        }
     }
     
     private fun setupToolbar() {
         setSupportActionBar(binding.toolbar)
-        binding.toolbar.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.action_settings -> {
-                    startActivity(Intent(this, SettingsActivity::class.java))
-                    true
-                }
-                else -> false
-            }
-        }
     }
     
     private fun setupRecyclerView() {
