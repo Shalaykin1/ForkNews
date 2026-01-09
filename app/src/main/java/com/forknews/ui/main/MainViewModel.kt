@@ -25,7 +25,12 @@ class MainViewModel(
             try {
                 val repo = parseRepositoryUrl(url)
                 if (repo != null) {
-                    repository.addRepository(repo)
+                    val repoId = repository.addRepository(repo)
+                    // Сразу проверяем релиз после добавления
+                    val addedRepo = repository.getRepositoryById(repoId)
+                    if (addedRepo != null) {
+                        repository.checkForUpdates(addedRepo)
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -42,7 +47,12 @@ class MainViewModel(
                 type = RepositoryType.GAMEHUB,
                 notificationsEnabled = true
             )
-            repository.addRepository(gameHub)
+            val repoId = repository.addRepository(gameHub)
+            // Сразу проверяем APK после добавления GameHub
+            val addedRepo = repository.getRepositoryById(repoId)
+            if (addedRepo != null) {
+                repository.checkForUpdates(addedRepo)
+            }
         }
     }
     

@@ -35,6 +35,10 @@ class RepositoryRepository(
         return repositoryDao.getRepositoriesWithNotifications()
     }
     
+    suspend fun getRepositoryById(id: Long): Repository? {
+        return repositoryDao.getRepositoryById(id)
+    }
+    
     suspend fun markReleaseAsViewed(id: Long) {
         repositoryDao.markReleaseAsViewed(id)
     }

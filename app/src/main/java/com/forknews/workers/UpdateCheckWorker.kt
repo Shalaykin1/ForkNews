@@ -166,6 +166,11 @@ class UpdateCheckWorker(
             .setDefaults(NotificationCompat.DEFAULT_ALL)
             .build()
         
-        notificationManager.notify(id, notification)
+        try {
+            notificationManager.notify(id, notification)
+            android.util.Log.d("UpdateCheckWorker", "Notification shown: $repoName - $releaseName")
+        } catch (e: Exception) {
+            android.util.Log.e("UpdateCheckWorker", "Failed to show notification", e)
+        }
     }
 }
