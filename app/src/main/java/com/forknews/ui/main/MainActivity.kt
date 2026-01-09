@@ -65,7 +65,6 @@ class MainActivity : AppCompatActivity() {
         
         setupToolbar()
         setupRecyclerView()
-        setupFab()
         setupSwipeRefresh()
         observeData()
         requestNotificationPermission()
@@ -78,6 +77,10 @@ class MainActivity : AppCompatActivity() {
     
     override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.action_add -> {
+                showAddRepositoryDialog()
+                true
+            }
             R.id.action_settings -> {
                 startActivity(Intent(this, SettingsActivity::class.java))
                 true
@@ -121,9 +124,14 @@ class MainActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         adapter = RepositoryAdapter(
             onItemClick = { repository ->
-                repository.latestReleaseUrl?.let { url ->
+                val url = if (repository.type == com.forknews.data.model.RepositoryType.GAMEHUB) {
+                    repository.url
+                } else {
+                    repository.latestReleaseUrl
+                }
+                url?.let {
                     viewModel.markReleaseAsViewed(repository.id)
-                    openUrl(url)
+                    openUrl(it)
                 }
             },
             onNotificationToggle = { repository ->
@@ -167,12 +175,6 @@ class MainActivity : AppCompatActivity() {
         })
         
         itemTouchHelper.attachToRecyclerView(binding.recyclerView)
-    }
-    
-    private fun setupFab() {
-        binding.fabAdd.setOnClickListener {
-            showAddRepositoryDialog()
-        }
     }
     
     private fun setupSwipeRefresh() {
