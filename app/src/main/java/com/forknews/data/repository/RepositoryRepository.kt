@@ -15,6 +15,10 @@ class RepositoryRepository(
     
     val allRepositories: Flow<List<Repository>> = repositoryDao.getAllRepositories()
     
+    suspend fun getAllRepositoriesList(): List<Repository> {
+        return repositoryDao.getAllRepositoriesList()
+    }
+    
     suspend fun addRepository(repository: Repository): Long {
         return repositoryDao.insertRepository(repository)
     }
@@ -25,6 +29,10 @@ class RepositoryRepository(
     
     suspend fun deleteRepository(repository: Repository) {
         repositoryDao.deleteRepository(repository)
+    }
+    
+    suspend fun getRepositoriesWithNotifications(): List<Repository> {
+        return repositoryDao.getRepositoriesWithNotifications()
     }
     
     suspend fun markReleaseAsViewed(id: Long) {
@@ -80,9 +88,5 @@ class RepositoryRepository(
             e.printStackTrace()
             false
         }
-    }
-    
-    suspend fun getRepositoriesWithNotifications(): List<Repository> {
-        return repositoryDao.getRepositoriesWithNotifications()
     }
 }

@@ -9,6 +9,9 @@ interface RepositoryDao {
     @Query("SELECT * FROM repositories ORDER BY id DESC")
     fun getAllRepositories(): Flow<List<Repository>>
     
+    @Query("SELECT * FROM repositories ORDER BY id DESC")
+    suspend fun getAllRepositoriesList(): List<Repository>
+    
     @Query("SELECT * FROM repositories WHERE id = :id")
     suspend fun getRepositoryById(id: Long): Repository?
     

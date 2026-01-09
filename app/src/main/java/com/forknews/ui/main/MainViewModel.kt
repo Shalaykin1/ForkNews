@@ -70,11 +70,12 @@ class MainViewModel(
         viewModelScope.launch {
             _isRefreshing.value = true
             try {
-                repositories.collect { repos ->
-                    repos.forEach { repo ->
-                        repository.checkForUpdates(repo)
-                    }
+                val repos = repository.getAllRepositoriesList()
+                repos.forEach { repo ->
+                    repository.checkForUpdates(repo)
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             } finally {
                 _isRefreshing.value = false
             }

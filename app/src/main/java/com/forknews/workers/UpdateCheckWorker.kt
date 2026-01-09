@@ -136,9 +136,12 @@ class UpdateCheckWorker(
         val channel = NotificationChannel(
             CHANNEL_ID,
             CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_HIGH
         ).apply {
             description = "Уведомления об обновлениях репозиториев"
+            enableLights(true)
+            enableVibration(true)
+            setShowBadge(true)
         }
         notificationManager.createNotificationChannel(channel)
         
@@ -155,9 +158,12 @@ class UpdateCheckWorker(
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("$repoName: новый релиз")
             .setContentText(releaseName)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
             .build()
         
         notificationManager.notify(id, notification)
