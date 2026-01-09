@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    private val repository: RepositoryRepository
+    val repository: RepositoryRepository
 ) : ViewModel() {
     
     val repositories = repository.allRepositories

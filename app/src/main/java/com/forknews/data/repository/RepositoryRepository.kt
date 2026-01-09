@@ -78,6 +78,14 @@ class RepositoryRepository(
                             System.currentTimeMillis()
                         )
                         return true
+                    } else {
+                        // Релиз не изменился, но обновляем время последней проверки
+                        repositoryDao.updateReleaseWithoutNotification(
+                            repository.id,
+                            newRelease,
+                            release.html_url,
+                            System.currentTimeMillis()
+                        )
                     }
                 }
             }
@@ -112,6 +120,14 @@ class RepositoryRepository(
                         System.currentTimeMillis()
                     )
                     return true
+                } else {
+                    // APK не изменился, но обновляем время последней проверки
+                    repositoryDao.updateReleaseWithoutNotification(
+                        repository.id,
+                        newApkName,
+                        "https://gamehub.xiaoji.com/download/",
+                        System.currentTimeMillis()
+                    )
                 }
             }
             false

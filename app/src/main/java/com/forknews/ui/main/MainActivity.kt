@@ -73,6 +73,9 @@ class MainActivity : AppCompatActivity() {
         observeData()
         requestNotificationPermission()
         
+        // Инициализируем предустановленные репозитории при первом запуске
+        initDefaultRepositoriesIfNeeded()
+        
         // Обновить репозитории при запуске
         viewModel.refreshAll()
     }
@@ -270,6 +273,70 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         } catch (e: Exception) {
             Toast.makeText(this, "Не удалось открыть ссылку", Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    private fun initDefaultRepositoriesIfNeeded() {
+        val prefs = getSharedPreferences("forknews_prefs", MODE_PRIVATE)
+        if (prefs.getBoolean("needs_init", false)) {
+            lifecycleScope.launch {
+                try {
+                    val existingRepos = viewModel.repository.getAllRepositoriesList()
+                    
+                    // Список репозиториев для добавления
+                    val defaultRepos = listOf(
+                        com.forknews.data.model.Repository(
+                            name = "AdrenoToolsDrivers",
+                            owner = "K11MCH1",
+                            url = "https://github.com/K11MCH1/AdrenoToolsDrivers",
+                            type = com.forknews.data.model.RepositoryType.GITHUB,
+                            notificationsEnabled = true
+                        ),
+                        com.forknews.data.model.Repository(
+                            name = "winlator",
+                            owner = "coffincolors",
+                            url = "https://github.com/coffincolors/winlator",
+                            type = com.forknews.data.model.RepositoryType.GITHUB,
+                            notificationsEnabled = true
+                        ),
+                        com.forknews.data.model.Repository(
+                            name = "Winlator-Ludashi",
+                            owner = "StevenMXZ",
+                            url = "https://github.com/StevenMXZ/Winlator-Ludashi",
+                            type = com.forknews.data.model.RepositoryType.GITHUB,
+                            notificationsEnabled = true
+                        ),
+                        com.forknews.data.model.Repository(
+                            name = "GameHub",
+                            owner = "",
+                            url = "https://gamehub.xiaoji.com/download/",
+                            type = com.forknews.data.model.RepositoryType.GAMEHUB,
+                            notificationsEnabled = true
+                        )
+                    )
+                    
+                    // Добавляем только те репозитории, которых еще нет
+                    for (repo in defaultRepos) {
+                        val exists = existingRepos.any { it.url == repo.url }
+                        if (!exists) {
+                            val repoId = viewModel.repository.addRepository(repo)
+                            // Сразу проверяем релизы для нового репозитория
+                            val addedRepo = viewModel.repository.getRepositoryById(repoId)
+                            if (addedRepo != null) {
+                                viewModel.repository.checkForUpdates(addedRepo)
+                            }
+                        }
+                    }
+                    
+                    // Отмечаем, что инициализация выполнена
+                    prefs.edit()
+                        .remove("needs_init")
+                        .putBoolean("default_repos_initialized", true)
+                        .apply()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
         }
     }
 }
