@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
 import com.forknews.R
 import com.forknews.data.local.AppDatabase
+import com.forknews.data.model.Repository
 import com.forknews.data.repository.RepositoryRepository
 import com.forknews.databinding.ActivityMainBinding
 import com.forknews.ui.settings.SettingsActivity
@@ -254,6 +255,8 @@ class MainActivity : AppCompatActivity() {
             ItemTouchHelper.UP or ItemTouchHelper.DOWN,
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
         ) {
+            private var draggedList: MutableList<Repository>? = null
+            
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
@@ -262,18 +265,29 @@ class MainActivity : AppCompatActivity() {
                 val fromPosition = viewHolder.bindingAdapterPosition
                 val toPosition = target.bindingAdapterPosition
                 
-                // Создаём новый список с обновлёнными позициями
-                val currentList = adapter.currentList.toMutableList()
-                val item = currentList.removeAt(fromPosition)
-                currentList.add(toPosition, item)
+                // Инициализируем список при первом перемещении
+                if (draggedList == null) {
+                    draggedList = adapter.currentList.toMutableList()
+                }
                 
-                // Обновляем адаптер для немедленной визуализации
-                adapter.submitList(currentList)
+                // Перемещаем элемент в списке
+                val item = draggedList!!.removeAt(fromPosition)
+                draggedList!!.add(toPosition, item)
                 
-                // Сохраняем новые позиции в БД
-                viewModel.moveRepository(fromPosition, toPosition, currentList)
+                // Уведомляем адаптер о перемещении для плавной анимации
+                adapter.notifyItemMoved(fromPosition, toPosition)
                 
                 return true
+            }
+            
+            override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+                super.clearView(recyclerView, viewHolder)
+                
+                // Сохраняем финальные позиции в БД после завершения drag
+                draggedList?.let { finalList ->
+                    viewModel.moveRepository(0, 0, finalList)
+                    draggedList = null
+                }
             }
             
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
