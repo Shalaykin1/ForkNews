@@ -42,5 +42,9 @@
     <color name="md_theme_dark_surface">#191C1A</color>
     <color name="md_theme_dark_onSurface">#E1E3DF</color>
     
+    <!-- Custom colors for darker text (10% darker than variant) -->
+    <color name="text_secondary_light">#4A4C4A</color>
+    <color name="text_secondary_dark">#B0B2AE</color>
+    
     <color name="ic_launcher_background">#0049B8</color>
 </resources>
