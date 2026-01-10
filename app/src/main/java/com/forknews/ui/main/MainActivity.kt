@@ -1,6 +1,9 @@
 package com.forknews.ui.main
 
 import android.Manifest
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -25,6 +28,7 @@ import com.forknews.data.local.AppDatabase
 import com.forknews.data.repository.RepositoryRepository
 import com.forknews.databinding.ActivityMainBinding
 import com.forknews.ui.settings.SettingsActivity
+import com.forknews.utils.DiagnosticLogger
 import com.forknews.utils.PreferencesManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
@@ -53,7 +57,7 @@ class MainActivity : AppCompatActivity() {
             AppDatabase::class.java,
             "forknews_database"
         )
-            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3)
+            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4)
             .fallbackToDestructiveMigration()
             .build()
         val repository = RepositoryRepository(database.repositoryDao())
@@ -62,6 +66,9 @@ class MainActivity : AppCompatActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        DiagnosticLogger.log("MainActivity", "=== ЗАПУСК ПРИЛОЖЕНИЯ ===")
+        DiagnosticLogger.log("MainActivity", "onCreate вызван")
         
         // Apply theme
         PreferencesManager.init(this)
@@ -77,10 +84,8 @@ class MainActivity : AppCompatActivity() {
         requestNotificationPermission()
         
         // Инициализируем предустановленные репозитории при первом запуске
+        DiagnosticLogger.log("MainActivity", "Вызов initDefaultRepositoriesIfNeeded()")
         initDefaultRepositoriesIfNeeded()
-        
-        // Обновить репозитории при запуске
-        viewModel.refreshAll()
     }
     
     override fun onResume() {
@@ -120,6 +125,10 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_add -> {
                 showAddRepositoryDialog()
+                true
+            }
+            R.id.action_diagnostic -> {
+                showDiagnosticDialog()
                 true
             }
             R.id.action_settings -> {
@@ -254,6 +263,36 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
     
+    private fun showDiagnosticDialog() {
+        val logs = DiagnosticLogger.getAllLogs()
+        val scrollView = android.widget.ScrollView(this).apply {
+            setPadding(48, 24, 48, 24)
+        }
+        val textView = android.widget.TextView(this).apply {
+            text = logs
+            textSize = 12f
+            setTextIsSelectable(true)
+            typeface = android.graphics.Typeface.MONOSPACE
+        }
+        scrollView.addView(textView)
+        
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Диагностика (${logs.lines().size} строк)")
+            .setView(scrollView)
+            .setPositiveButton("Скопировать") { _, _ ->
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText("ForkNews Diagnostic Log", logs)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(this, "Лог скопирован в буфер обмена", Toast.LENGTH_SHORT).show()
+            }
+            .setNeutralButton("Очистить") { _, _ ->
+                DiagnosticLogger.clear()
+                Toast.makeText(this, "Логи очищены", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Закрыть", null)
+            .show()
+    }
+    
     private fun openUrl(url: String) {
         try {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
@@ -266,10 +305,13 @@ class MainActivity : AppCompatActivity() {
     private fun initDefaultRepositoriesIfNeeded() {
         lifecycleScope.launch {
             try {
+                DiagnosticLogger.log("MainActivity", "initDefaultRepositoriesIfNeeded: начало")
                 val existingRepos = viewModel.repository.getAllRepositoriesList()
+                DiagnosticLogger.log("MainActivity", "Найдено существующих репозиториев: ${existingRepos.size}")
                 
-                // Если репозиториев меньше 4, добавляем недостающие
-                if (existingRepos.size < 4) {
+                // Если репозиториев меньше 5, добавляем недостающие
+                if (existingRepos.size < 5) {
+                    DiagnosticLogger.log("MainActivity", "Требуется добавить репозитории")
                     // Список репозиториев для добавления
                     val defaultRepos = listOf(
                         com.forknews.data.model.Repository(
@@ -299,6 +341,13 @@ class MainActivity : AppCompatActivity() {
                             url = "https://github.com/brunodev85/winlator",
                             type = com.forknews.data.model.RepositoryType.GITHUB,
                             notificationsEnabled = true
+                        ),
+                        com.forknews.data.model.Repository(
+                            name = "ForkNews",
+                            owner = "Shalaykin1",
+                            url = "https://github.com/Shalaykin1/ForkNews",
+                            type = com.forknews.data.model.RepositoryType.GITHUB,
+                            notificationsEnabled = true
                         )
                     )
                     
@@ -307,16 +356,25 @@ class MainActivity : AppCompatActivity() {
                     for (repo in defaultRepos) {
                         val exists = existingRepos.any { it.url == repo.url }
                         if (!exists) {
+                            DiagnosticLogger.log("MainActivity", "Добавляем репозиторий: ${repo.owner}/${repo.name}")
                             val repoId = viewModel.repository.addRepository(repo)
                             // ВАЖНО: Синхронно загружаем релиз для каждого репозитория
                             val addedRepo = viewModel.repository.getRepositoryById(repoId)
                             if (addedRepo != null) {
-                                viewModel.repository.checkForUpdates(addedRepo)
+                                DiagnosticLogger.log("MainActivity", "Загружаем релиз для: ${addedRepo.owner}/${addedRepo.name}")
+                                val updated = viewModel.repository.checkForUpdates(addedRepo)
+                                DiagnosticLogger.log("MainActivity", "Релиз загружен для ${addedRepo.owner}/${addedRepo.name}: updated=$updated")
+                            } else {
+                                DiagnosticLogger.error("MainActivity", "Не удалось получить репозиторий с ID: $repoId")
                             }
                         }
                     }
+                    DiagnosticLogger.log("MainActivity", "initDefaultRepositoriesIfNeeded: все репозитории обработаны")
+                } else {
+                    DiagnosticLogger.log("MainActivity", "Репозитории уже инициализированы (${existingRepos.size})")
                 }
             } catch (e: Exception) {
+                DiagnosticLogger.error("MainActivity", "Ошибка в initDefaultRepositoriesIfNeeded: ${e.message}", e)
                 e.printStackTrace()
             }
         }

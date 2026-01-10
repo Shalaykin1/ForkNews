@@ -106,7 +106,7 @@ class UpdateCheckWorker(
                 AppDatabase::class.java,
                 "forknews_database"
             )
-                .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3)
+                .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4)
                 .fallbackToDestructiveMigration()
                 .build()
             
@@ -159,14 +159,18 @@ class UpdateCheckWorker(
         
         val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("$repoName: новый релиз")
+            .setContentTitle("🔔 $repoName: новый релиз")
             .setContentText(releaseName)
+            .setStyle(NotificationCompat.BigTextStyle().bigText("Доступна новая версия: $releaseName\n\nНажмите для просмотра на GitHub"))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_MESSAGE)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .setDefaults(NotificationCompat.DEFAULT_ALL)
+            .setOnlyAlertOnce(false)
+            .setShowWhen(true)
+            .setWhen(System.currentTimeMillis())
             .build()
         
         try {

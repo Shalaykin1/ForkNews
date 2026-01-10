@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.forknews.data.model.Repository
 import com.forknews.databinding.ItemRepositoryBinding
+import java.text.SimpleDateFormat
+import java.util.*
 
 class RepositoryAdapter(
     private val onItemClick: (Repository) -> Unit,
@@ -63,6 +65,14 @@ class RepositoryAdapter(
                     tvReleaseType.visibility = android.view.View.GONE
                 }
                 
+                // Отображаем дату публикации
+                if (repository.publishedAt != null) {
+                    tvPublishedDate.visibility = android.view.View.VISIBLE
+                    tvPublishedDate.text = formatPublishedDate(repository.publishedAt)
+                } else {
+                    tvPublishedDate.visibility = android.view.View.GONE
+                }
+                
                 ivNewBadge.visibility = if (repository.hasNewRelease) {
                     android.view.View.VISIBLE
                 } else {
@@ -72,6 +82,24 @@ class RepositoryAdapter(
                 root.setOnClickListener {
                     onItemClick(repository)
                 }
+            }
+        }
+        
+        private fun formatPublishedDate(dateString: String): String {
+            return try {
+                // GitHub формат: 2024-01-10T15:30:00Z
+                val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+                inputFormat.timeZone = TimeZone.getTimeZone("UTC")
+                val date = inputFormat.parse(dateString)
+                
+                if (date != null) {
+                    val outputFormat = SimpleDateFormat("d MMMM yyyy, HH:mm", Locale("ru"))
+                    "Опубликовано: ${outputFormat.format(date)}"
+                } else {
+                    ""
+                }
+            } catch (e: Exception) {
+                ""
             }
         }
     }

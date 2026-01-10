@@ -22,6 +22,7 @@ object PreferencesManager {
     private val CUSTOM_TIME_ENABLED_KEY = booleanPreferencesKey("custom_time_enabled")
     private val CUSTOM_TIME_HOUR_KEY = intPreferencesKey("custom_time_hour")
     private val CUSTOM_TIME_MINUTE_KEY = intPreferencesKey("custom_time_minute")
+    private val GITHUB_TOKEN_KEY = stringPreferencesKey("github_token")
     
     fun init(context: Context) {
         this.context = context.applicationContext
@@ -113,6 +114,25 @@ object PreferencesManager {
     fun getCustomTimeMinute(): Flow<Int> {
         return context.dataStore.data.map { preferences ->
             preferences[CUSTOM_TIME_MINUTE_KEY] ?: 0
+        }
+    }
+    
+    // GitHub Token
+    suspend fun setGitHubToken(token: String) {
+        context.dataStore.edit { preferences ->
+            preferences[GITHUB_TOKEN_KEY] = token
+        }
+    }
+    
+    fun getGitHubToken(): Flow<String> {
+        return context.dataStore.data.map { preferences ->
+            preferences[GITHUB_TOKEN_KEY] ?: ""
+        }
+    }
+    
+    fun getGitHubTokenSync(): String {
+        return runBlocking {
+            getGitHubToken().first()
         }
     }
     

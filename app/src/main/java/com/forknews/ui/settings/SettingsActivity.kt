@@ -25,6 +25,7 @@ class SettingsActivity : AppCompatActivity() {
         setupCheckInterval()
         setupThemeSettings()
         setupNotifications()
+        setupGitHubToken()
         setupCustomTime()
         
         loadSettings()
@@ -124,6 +125,38 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
     
+    private fun setupGitHubToken() {
+        binding.btnTokenHelp.setOnClickListener {
+            showTokenHelpDialog()
+        }
+        
+        binding.etGitHubToken.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                lifecycleScope.launch {
+                    val token = binding.etGitHubToken.text.toString().trim()
+                    PreferencesManager.setGitHubToken(token)
+                }
+            }
+        }
+    }
+    
+    private fun showTokenHelpDialog() {
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Как получить GitHub токен")
+            .setMessage("""
+                1. Перейдите на github.com/settings/tokens
+                2. Нажмите "Generate new token (classic)"
+                3. Дайте токену имя (например, "ForkNews")
+                4. Не выбирайте никакие разрешения (public_repo не нужен)
+                5. Нажмите "Generate token"
+                6. Скопируйте токен и вставьте сюда
+                
+                Токен увеличит лимит API с 60 до 5000 запросов в час.
+            """.trimIndent())
+            .setPositiveButton("OK", null)
+            .show()
+    }
+    
     private fun setupCustomTime() {
         binding.btnSelectTime.setOnClickListener {
             lifecycleScope.launch {
@@ -191,6 +224,10 @@ class SettingsActivity : AppCompatActivity() {
             // Load notifications
             val notificationsEnabled = PreferencesManager.getNotificationsEnabled().first()
             binding.switchNotifications.isChecked = notificationsEnabled
+            
+            // Load GitHub token
+            val token = PreferencesManager.getGitHubToken().first()
+            binding.etGitHubToken.setText(token)
         }
     }
 }

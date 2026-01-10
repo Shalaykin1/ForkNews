@@ -1,5 +1,6 @@
 package com.forknews.data.remote
 
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -13,7 +14,29 @@ object RetrofitClient {
         level = HttpLoggingInterceptor.Level.BODY
     }
     
+    private val authInterceptor = Interceptor { chain ->
+        val request = chain.request()
+        val token = getGitHubToken()
+        val newRequest = if (token.isNotEmpty()) {
+            request.newBuilder()
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+        } else {
+            request
+        }
+        chain.proceed(newRequest)
+    }
+    
+    private fun getGitHubToken(): String {
+        return try {
+            com.forknews.utils.PreferencesManager.getGitHubTokenSync()
+        } catch (e: Exception) {
+            ""
+        }
+    }
+    
     private val okHttpClient = OkHttpClient.Builder()
+        .addInterceptor(authInterceptor)
         .addInterceptor(loggingInterceptor)
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)

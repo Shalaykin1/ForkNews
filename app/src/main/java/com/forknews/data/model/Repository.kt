@@ -17,7 +17,8 @@ data class Repository(
     val notificationsEnabled: Boolean = true,
     val type: RepositoryType = RepositoryType.GITHUB,
     val lastChecked: Long = 0,
-    val isPrerelease: Boolean = false
+    val isPrerelease: Boolean = false,
+    val publishedAt: String? = null
 )
 
 enum class RepositoryType {
