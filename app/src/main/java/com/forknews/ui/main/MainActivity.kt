@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: RepositoryAdapter
     private val handler = Handler(Looper.getMainLooper())
     private var autoRefreshRunnable: Runnable? = null
+    private var timeLogRunnable: Runnable? = null
     
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -101,12 +102,16 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         // Запустить автообновление каждые 60 секунд когда приложение открыто
         startAutoRefresh()
+        // Запустить таймер логирования времени
+        startTimeLogger()
     }
     
     override fun onPause() {
         super.onPause()
         // Остановить автообновление когда приложение свернуто
         stopAutoRefresh()
+        // Остановить таймер логирования
+        stopTimeLogger()
     }
     
     private fun startAutoRefresh() {
@@ -123,6 +128,24 @@ class MainActivity : AppCompatActivity() {
     private fun stopAutoRefresh() {
         autoRefreshRunnable?.let { handler.removeCallbacks(it) }
         autoRefreshRunnable = null
+    }
+    
+    private fun startTimeLogger() {
+        stopTimeLogger() // Остановить предыдущий, если был
+        timeLogRunnable = object : Runnable {
+            override fun run() {
+                val currentTime = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault())
+                    .format(java.util.Date())
+                DiagnosticLogger.log("TimeLogger", "Текущее время: $currentTime")
+                handler.postDelayed(this, 10_000) // 10 секунд
+            }
+        }
+        handler.post(timeLogRunnable!!)
+    }
+    
+    private fun stopTimeLogger() {
+        timeLogRunnable?.let { handler.removeCallbacks(it) }
+        timeLogRunnable = null
     }
     
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

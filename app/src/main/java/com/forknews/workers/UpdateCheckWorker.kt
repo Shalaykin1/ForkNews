@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.room.Room
 import androidx.work.*
@@ -196,6 +197,10 @@ class UpdateCheckWorker(
                     .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .build()
             )
+            // Для Android 13+ - принудительно включаем всплывающие уведомления
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                setBlockable(false)
+            }
         }
         notificationManager.createNotificationChannel(channel)
         
@@ -221,7 +226,7 @@ class UpdateCheckWorker(
             .setContentTitle("🔔 $repoName: новый релиз")
             .setContentText(releaseName)
             .setStyle(NotificationCompat.BigTextStyle().bigText("Доступна новая версия: $releaseName\n\nНажмите для просмотра на GitHub"))
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_MESSAGE)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentIntent(pendingIntent)
@@ -230,6 +235,9 @@ class UpdateCheckWorker(
             .setOnlyAlertOnce(false)
             .setShowWhen(true)
             .setWhen(System.currentTimeMillis())
+            .setSound(android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION))
+            .setVibrate(longArrayOf(0, 500, 200, 500))
+            .setLights(android.graphics.Color.BLUE, 1000, 1000)
             .build()
         
         try {
