@@ -32,6 +32,7 @@ import com.forknews.utils.DiagnosticLogger
 import com.forknews.utils.PreferencesManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -87,6 +88,13 @@ class MainActivity : AppCompatActivity() {
         // Инициализируем предустановленные репозитории при первом запуске
         DiagnosticLogger.log("MainActivity", "Вызов initDefaultRepositoriesIfNeeded()")
         initDefaultRepositoriesIfNeeded()
+        
+        // Запустить фоновую проверку обновлений
+        lifecycleScope.launch {
+            val interval = PreferencesManager.getCheckInterval().first()
+            DiagnosticLogger.log("MainActivity", "Запуск WorkManager с интервалом: $interval мин")
+            com.forknews.workers.UpdateCheckWorker.schedulePeriodicWork(this@MainActivity, interval)
+        }
     }
     
     override fun onResume() {
