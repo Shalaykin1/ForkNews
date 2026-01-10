@@ -152,7 +152,29 @@ class UpdateCheckWorker(
     
     private fun showNotification(id: Int, repoName: String, releaseName: String, url: String) {
         com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "showNotification вызван: id=$id, repo=$repoName, release=$releaseName")
+        
+        // Check notification permission for Android 13+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            val hasPermission = androidx.core.content.ContextCompat.checkSelfPermission(
+                applicationContext,
+                android.Manifest.permission.POST_NOTIFICATIONS
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "POST_NOTIFICATIONS разрешение: $hasPermission")
+            
+            if (!hasPermission) {
+                com.forknews.utils.DiagnosticLogger.error("UpdateCheckWorker", "⚠️ Нет разрешения POST_NOTIFICATIONS! Уведомление не будет показано.")
+                return
+            }
+        }
+        
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        
+        // Check if notifications are enabled
+        if (!notificationManager.areNotificationsEnabled()) {
+            com.forknews.utils.DiagnosticLogger.error("UpdateCheckWorker", "⚠️ Уведомления отключены в системных настройках!")
+            return
+        }
         
         // Create notification channel for Android O and above
         val channel = NotificationChannel(
@@ -162,11 +184,28 @@ class UpdateCheckWorker(
         ).apply {
             description = "Уведомления об обновлениях репозиториев"
             enableLights(true)
+            lightColor = android.graphics.Color.BLUE
             enableVibration(true)
+            vibrationPattern = longArrayOf(0, 500, 200, 500)
             setShowBadge(true)
+            lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
+            setSound(
+                android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION),
+                android.media.AudioAttributes.Builder()
+                    .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION)
+                    .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+            )
         }
         notificationManager.createNotificationChannel(channel)
-        com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "Канал уведомлений создан: $CHANNEL_ID")
+        
+        // Check channel importance
+        val createdChannel = notificationManager.getNotificationChannel(CHANNEL_ID)
+        com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "Канал создан: importance=${createdChannel?.importance}")
+        
+        if (createdChannel?.importance == NotificationManager.IMPORTANCE_NONE) {
+            com.forknews.utils.DiagnosticLogger.error("UpdateCheckWorker", "⚠️ Канал уведомлений отключен пользователем!")
+        }
         
         // Create intent to open URL
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
