@@ -337,8 +337,8 @@ class MainActivity : AppCompatActivity() {
                 val existingRepos = viewModel.repository.getAllRepositoriesList()
                 DiagnosticLogger.log("MainActivity", "Найдено существующих репозиториев: ${existingRepos.size}")
                 
-                // Если репозиториев меньше 5, добавляем недостающие
-                if (existingRepos.size < 5) {
+                // Если репозиториев меньше 6, добавляем недостающие
+                if (existingRepos.size < 6) {
                     DiagnosticLogger.log("MainActivity", "Требуется добавить репозитории")
                     // Список репозиториев для добавления
                     val defaultRepos = listOf(
@@ -374,6 +374,13 @@ class MainActivity : AppCompatActivity() {
                             name = "ForkNews",
                             owner = "Shalaykin1",
                             url = "https://github.com/Shalaykin1/ForkNews",
+                            type = com.forknews.data.model.RepositoryType.GITHUB,
+                            notificationsEnabled = true
+                        ),
+                        com.forknews.data.model.Repository(
+                            name = "purple-turnip",
+                            owner = "MrPurple666",
+                            url = "https://github.com/MrPurple666/purple-turnip",
                             type = com.forknews.data.model.RepositoryType.GITHUB,
                             notificationsEnabled = true
                         )
