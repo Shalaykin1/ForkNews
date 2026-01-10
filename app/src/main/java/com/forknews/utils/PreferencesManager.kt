@@ -37,7 +37,7 @@ object PreferencesManager {
     
     fun getCheckInterval(): Flow<Long> {
         return context.dataStore.data.map { preferences ->
-            preferences[CHECK_INTERVAL_KEY] ?: 1L // Default 1 minute
+            preferences[CHECK_INTERVAL_KEY] ?: 5L // Default 5 minutes
         }
     }
     

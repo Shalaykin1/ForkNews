@@ -105,10 +105,10 @@ class MainActivity : AppCompatActivity() {
         autoRefreshRunnable = object : Runnable {
             override fun run() {
                 viewModel.refreshAll()
-                handler.postDelayed(this, 60_000) // 60 секунд
+                handler.postDelayed(this, 300_000) // 5 минут
             }
         }
-        handler.postDelayed(autoRefreshRunnable!!, 60_000)
+        handler.postDelayed(autoRefreshRunnable!!, 300_000)
     }
     
     private fun stopAutoRefresh() {

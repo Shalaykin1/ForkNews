@@ -42,7 +42,7 @@ class SettingsActivity : AppCompatActivity() {
     
     private fun setupCheckInterval() {
         val intervals = arrayOf(
-            "1 минута",
+            "5 минут",
             "30 минут",
             "1 час",
             "2 часа",
@@ -65,7 +65,7 @@ class SettingsActivity : AppCompatActivity() {
                 ) {
                     lifecycleScope.launch {
                         val minutes = when (position) {
-                            0 -> 1L
+                            0 -> 5L
                             1 -> 30L
                             2 -> 60L
                             3 -> 120L
@@ -189,7 +189,7 @@ class SettingsActivity : AppCompatActivity() {
             // Load check interval
             val checkInterval = PreferencesManager.getCheckInterval().first()
             val position = when (checkInterval) {
-                1L -> 0
+                5L -> 0
                 30L -> 1
                 60L -> 2
                 120L -> 3
