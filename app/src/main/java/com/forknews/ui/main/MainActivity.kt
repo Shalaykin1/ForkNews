@@ -368,8 +368,8 @@ class MainActivity : AppCompatActivity() {
                 val existingRepos = viewModel.repository.getAllRepositoriesList()
                 DiagnosticLogger.log("MainActivity", "Найдено существующих репозиториев: ${existingRepos.size}")
                 
-                // Если репозиториев меньше 6, добавляем недостающие
-                if (existingRepos.size < 6) {
+                // Если репозиториев меньше 7, добавляем недостающие
+                if (existingRepos.size < 7) {
                     DiagnosticLogger.log("MainActivity", "Требуется добавить репозитории")
                     // Список репозиториев для добавления
                     val defaultRepos = listOf(
@@ -412,6 +412,13 @@ class MainActivity : AppCompatActivity() {
                             name = "purple-turnip",
                             owner = "MrPurple666",
                             url = "https://github.com/MrPurple666/purple-turnip",
+                            type = com.forknews.data.model.RepositoryType.GITHUB,
+                            notificationsEnabled = true
+                        ),
+                        com.forknews.data.model.Repository(
+                            name = "Releases",
+                            owner = "eden-emulator",
+                            url = "https://github.com/eden-emulator/Releases",
                             type = com.forknews.data.model.RepositoryType.GITHUB,
                             notificationsEnabled = true
                         )
