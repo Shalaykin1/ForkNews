@@ -285,12 +285,40 @@ class MainActivity : AppCompatActivity() {
                 clipboard.setPrimaryClip(clip)
                 Toast.makeText(this, "Лог скопирован в буфер обмена", Toast.LENGTH_SHORT).show()
             }
-            .setNeutralButton("Очистить") { _, _ ->
+            .setNeutralButton("Поделиться") { _, _ ->
+                shareLogFile(logs)
+            }
+            .setNegativeButton("Очистить") { _, _ ->
                 DiagnosticLogger.clear()
                 Toast.makeText(this, "Логи очищены", Toast.LENGTH_SHORT).show()
             }
-            .setNegativeButton("Закрыть", null)
             .show()
+    }
+    
+    private fun shareLogFile(logs: String) {
+        try {
+            val timestamp = java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", java.util.Locale.getDefault()).format(java.util.Date())
+            val fileName = "log_$timestamp.txt"
+            val file = java.io.File(cacheDir, fileName)
+            file.writeText(logs)
+            
+            val uri = androidx.core.content.FileProvider.getUriForFile(
+                this,
+                "${applicationContext.packageName}.fileprovider",
+                file
+            )
+            
+            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                putExtra(Intent.EXTRA_SUBJECT, "ForkNews Diagnostic Log")
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            
+            startActivity(Intent.createChooser(shareIntent, "Поделиться логом"))
+        } catch (e: Exception) {
+            Toast.makeText(this, "Ошибка при создании файла: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
     }
     
     private fun openUrl(url: String) {
