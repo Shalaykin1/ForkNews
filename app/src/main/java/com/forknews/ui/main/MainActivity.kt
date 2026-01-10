@@ -368,8 +368,8 @@ class MainActivity : AppCompatActivity() {
                 val existingRepos = viewModel.repository.getAllRepositoriesList()
                 DiagnosticLogger.log("MainActivity", "Найдено существующих репозиториев: ${existingRepos.size}")
                 
-                // Если репозиториев меньше 7, добавляем недостающие
-                if (existingRepos.size < 7) {
+                // Если репозиториев меньше 8, добавляем недостающие
+                if (existingRepos.size < 8) {
                     DiagnosticLogger.log("MainActivity", "Требуется добавить репозитории")
                     // Список репозиториев для добавления
                     val defaultRepos = listOf(
@@ -419,6 +419,13 @@ class MainActivity : AppCompatActivity() {
                             name = "Releases",
                             owner = "eden-emulator",
                             url = "https://github.com/eden-emulator/Releases",
+                            type = com.forknews.data.model.RepositoryType.GITHUB,
+                            notificationsEnabled = true
+                        ),
+                        com.forknews.data.model.Repository(
+                            name = "aps3e",
+                            owner = "aenu1",
+                            url = "https://github.com/aenu1/aps3e",
                             type = com.forknews.data.model.RepositoryType.GITHUB,
                             notificationsEnabled = true
                         )
