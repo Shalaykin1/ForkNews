@@ -94,10 +94,13 @@ class UpdateCheckWorker(
     
     override suspend fun doWork(): Result {
         return try {
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "=== WORKER ЗАПУЩЕН ===")
             PreferencesManager.init(applicationContext)
             val notificationsEnabled = PreferencesManager.getNotificationsEnabled().first()
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "Уведомления включены: $notificationsEnabled")
             
             if (!notificationsEnabled) {
+                com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "Уведомления отключены в настройках, выход")
                 return Result.success()
             }
             
@@ -112,10 +115,16 @@ class UpdateCheckWorker(
             
             val repository = RepositoryRepository(database.repositoryDao())
             val repos = repository.getRepositoriesWithNotifications()
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "Найдено репозиториев с уведомлениями: ${repos.size}")
             
+            var updatesFound = 0
             for (repo in repos) {
+                com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "Проверяем: ${repo.owner}/${repo.name}")
                 val hasUpdate = repository.checkForUpdates(repo)
+                com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "Обновление найдено: $hasUpdate")
                 if (hasUpdate) {
+                    updatesFound++
+                    com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "Показываем уведомление для: ${repo.name}")
                     showNotification(
                         repo.id.toInt(),
                         repo.name,
@@ -125,14 +134,17 @@ class UpdateCheckWorker(
                 }
             }
             
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "=== WORKER ЗАВЕРШЁН === (обновлений: $updatesFound)")
             Result.success()
         } catch (e: Exception) {
+            com.forknews.utils.DiagnosticLogger.error("UpdateCheckWorker", "ОШИБКА: ${e.message}", e)
             e.printStackTrace()
             Result.retry()
         }
     }
     
     private fun showNotification(id: Int, repoName: String, releaseName: String, url: String) {
+        com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "showNotification вызван: id=$id, repo=$repoName, release=$releaseName")
         val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         
         // Create notification channel for Android O and above
@@ -147,6 +159,7 @@ class UpdateCheckWorker(
             setShowBadge(true)
         }
         notificationManager.createNotificationChannel(channel)
+        com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "Канал уведомлений создан: $CHANNEL_ID")
         
         // Create intent to open URL
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
@@ -175,8 +188,10 @@ class UpdateCheckWorker(
         
         try {
             notificationManager.notify(id, notification)
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "✓ Уведомление отправлено: $repoName - $releaseName")
             android.util.Log.d("UpdateCheckWorker", "Notification shown: $repoName - $releaseName")
         } catch (e: Exception) {
+            com.forknews.utils.DiagnosticLogger.error("UpdateCheckWorker", "✗ Ошибка отправки уведомления: ${e.message}", e)
             android.util.Log.e("UpdateCheckWorker", "Failed to show notification", e)
         }
     }
