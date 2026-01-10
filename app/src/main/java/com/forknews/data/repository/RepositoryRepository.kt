@@ -41,6 +41,10 @@ class RepositoryRepository(
         repositoryDao.markReleaseAsViewed(id)
     }
     
+    suspend fun updatePosition(id: Long, position: Int) {
+        repositoryDao.updatePosition(id, position)
+    }
+    
     suspend fun checkForUpdates(repository: Repository): Boolean {
         com.forknews.utils.DiagnosticLogger.log("RepositoryRepository", "checkForUpdates начинается для: ${repository.owner}/${repository.name}")
         val result = checkGitHubUpdate(repository)

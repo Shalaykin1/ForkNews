@@ -18,7 +18,8 @@ data class Repository(
     val type: RepositoryType = RepositoryType.GITHUB,
     val lastChecked: Long = 0,
     val isPrerelease: Boolean = false,
-    val publishedAt: String? = null
+    val publishedAt: String? = null,
+    val position: Int = 0
 )
 
 enum class RepositoryType {

@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
             AppDatabase::class.java,
             "forknews_database"
         )
-            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4)
+            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4, AppDatabase.MIGRATION_4_5)
             .fallbackToDestructiveMigration()
             .build()
         val repository = RepositoryRepository(database.repositoryDao())
@@ -226,16 +226,32 @@ class MainActivity : AppCompatActivity() {
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
         
-        // Swipe to delete
+        // Swipe to delete and drag to reorder
         val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
-            0,
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN,
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
         ) {
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
-            ): Boolean = false
+            ): Boolean {
+                val fromPosition = viewHolder.bindingAdapterPosition
+                val toPosition = target.bindingAdapterPosition
+                
+                // Создаём новый список с обновлёнными позициями
+                val currentList = adapter.currentList.toMutableList()
+                val item = currentList.removeAt(fromPosition)
+                currentList.add(toPosition, item)
+                
+                // Обновляем адаптер для немедленной визуализации
+                adapter.submitList(currentList)
+                
+                // Сохраняем новые позиции в БД
+                viewModel.moveRepository(fromPosition, toPosition, currentList)
+                
+                return true
+            }
             
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.bindingAdapterPosition

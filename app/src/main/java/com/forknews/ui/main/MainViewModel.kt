@@ -59,6 +59,15 @@ class MainViewModel(
         }
     }
     
+    fun moveRepository(fromPosition: Int, toPosition: Int, repositories: List<Repository>) {
+        viewModelScope.launch {
+            // Обновляем позиции для всех затронутых репозиториев
+            repositories.forEachIndexed { index, repo ->
+                repository.updatePosition(repo.id, index)
+            }
+        }
+    }
+    
     fun refreshAll() {
         viewModelScope.launch {
             _isRefreshing.value = true

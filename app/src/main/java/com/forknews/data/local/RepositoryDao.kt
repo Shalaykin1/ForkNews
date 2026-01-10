@@ -6,10 +6,10 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RepositoryDao {
-    @Query("SELECT * FROM repositories ORDER BY id DESC")
+    @Query("SELECT * FROM repositories ORDER BY position ASC, id DESC")
     fun getAllRepositories(): Flow<List<Repository>>
     
-    @Query("SELECT * FROM repositories ORDER BY id DESC")
+    @Query("SELECT * FROM repositories ORDER BY position ASC, id DESC")
     suspend fun getAllRepositoriesList(): List<Repository>
     
     @Query("SELECT * FROM repositories WHERE id = :id")
@@ -35,4 +35,7 @@ interface RepositoryDao {
     
     @Query("UPDATE repositories SET latestRelease = :release, latestReleaseUrl = :url, releaseName = :releaseName, hasNewRelease = 0, lastChecked = :timestamp, isPrerelease = :isPrerelease, publishedAt = :publishedAt WHERE id = :id")
     suspend fun updateReleaseWithoutNotification(id: Long, release: String, url: String, releaseName: String?, timestamp: Long, isPrerelease: Boolean, publishedAt: String?)
+    
+    @Query("UPDATE repositories SET position = :position WHERE id = :id")
+    suspend fun updatePosition(id: Long, position: Int)
 }
