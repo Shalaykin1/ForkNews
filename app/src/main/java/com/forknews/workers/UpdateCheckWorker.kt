@@ -37,6 +37,12 @@ class UpdateCheckWorker(
                 TimeUnit.MINUTES
             )
                 .setConstraints(constraints)
+                .setBackoffCriteria(
+                    BackoffPolicy.LINEAR,
+                    15,
+                    TimeUnit.MINUTES
+                )
+                .addTag("update_check")
                 .build()
             
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
@@ -44,6 +50,7 @@ class UpdateCheckWorker(
                 ExistingPeriodicWorkPolicy.REPLACE,
                 workRequest
             )
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "Запланирована периодическая работа: интервал $intervalMinutes мин")
         }
         
         fun scheduleCustomTimeWork(context: Context, hour: Int, minute: Int) {

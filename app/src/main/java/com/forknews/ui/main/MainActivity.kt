@@ -82,6 +82,7 @@ class MainActivity : AppCompatActivity() {
         setupSwipeRefresh()
         observeData()
         requestNotificationPermission()
+        requestBatteryOptimizationExemption()
         
         // Инициализируем предустановленные репозитории при первом запуске
         DiagnosticLogger.log("MainActivity", "Вызов initDefaultRepositoriesIfNeeded()")
@@ -136,6 +137,36 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+    
+    private fun requestBatteryOptimizationExemption() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val powerManager = getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+            val packageName = packageName
+            
+            if (!powerManager.isIgnoringBatteryOptimizations(packageName)) {
+                DiagnosticLogger.log("MainActivity", "Запрос отключения оптимизации батареи")
+                MaterialAlertDialogBuilder(this)
+                    .setTitle("Фоновая работа")
+                    .setMessage("Для надёжной работы уведомлений в фоне рекомендуется отключить оптимизацию батареи для ForkNews.\n\nЭто позволит приложению проверять обновления даже в фоновом режиме.")
+                    .setPositiveButton("Настроить") { _, _ ->
+                        try {
+                            val intent = Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                                data = Uri.parse("package:$packageName")
+                            }
+                            startActivity(intent)
+                            DiagnosticLogger.log("MainActivity", "Открыт экран настроек батареи")
+                        } catch (e: Exception) {
+                            DiagnosticLogger.error("MainActivity", "Ошибка открытия настроек батареи: ${e.message}", e)
+                            Toast.makeText(this, "Не удалось открыть настройки", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .setNegativeButton("Позже", null)
+                    .show()
+            } else {
+                DiagnosticLogger.log("MainActivity", "Оптимизация батареи уже отключена")
+            }
         }
     }
     
