@@ -297,7 +297,7 @@ class MainActivity : AppCompatActivity() {
     
     private fun shareLogFile(logs: String) {
         try {
-            val timestamp = java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", java.util.Locale.getDefault()).format(java.util.Date())
+            val timestamp = java.text.SimpleDateFormat("HH-mm-ss_yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
             val fileName = "log_$timestamp.txt"
             val file = java.io.File(cacheDir, fileName)
             file.writeText(logs)
