@@ -11,70 +11,85 @@ if command -v convert &> /dev/null; then
     
     # mdpi (48x48)
     convert -size 48x48 xc:"#0049B8" \
-            -fill white -stroke white -strokewidth 1 \
-            -draw "circle 24,14 24,18" \
-            -draw "circle 16,36 16,40" \
-            -draw "circle 32,36 32,40" \
-            -draw "line 24,18 24,28" \
-            -draw "line 16,28 32,28" \
-            -draw "line 16,28 16,36" \
-            -draw "line 32,28 32,36" \
+            -fill white -draw "roundrectangle 8,7 40,41 2,2" \
+            -fill "#0049B8" -draw "rectangle 11,12 35,14" \
+            -fill "#0049B8" -draw "rectangle 11,17 35,19" \
+            -fill "#0049B8" -draw "rectangle 11,22 28,24" \
+            -fill "#0049B8" -draw "circle 24,10 24,12" \
+            -fill "#0049B8" -draw "circle 17,34 17,36" \
+            -fill "#0049B8" -draw "circle 31,34 31,36" \
+            -fill "#0049B8" -draw "line 24,12 24,26" \
+            -fill "#0049B8" -draw "line 17,26 31,26" \
+            -fill "#0049B8" -draw "line 17,26 17,34" \
+            -fill "#0049B8" -draw "line 31,26 31,34" \
             app/src/main/res/mipmap-mdpi/ic_launcher.png
     
     cp app/src/main/res/mipmap-mdpi/ic_launcher.png app/src/main/res/mipmap-mdpi/ic_launcher_round.png
     
     # hdpi (72x72)
     convert -size 72x72 xc:"#0049B8" \
-            -fill white -stroke white -strokewidth 2 \
-            -draw "circle 36,21 36,27" \
-            -draw "circle 24,54 24,60" \
-            -draw "circle 48,54 48,60" \
-            -draw "line 36,27 36,42" \
-            -draw "line 24,42 48,42" \
-            -draw "line 24,42 24,54" \
-            -draw "line 48,42 48,54" \
+            -fill white -draw "roundrectangle 12,10 60,62 3,3" \
+            -fill "#0049B8" -draw "rectangle 17,18 53,21" \
+            -fill "#0049B8" -draw "rectangle 17,26 53,29" \
+            -fill "#0049B8" -draw "rectangle 17,34 42,37" \
+            -fill "#0049B8" -draw "circle 36,15 36,18" \
+            -fill "#0049B8" -draw "circle 26,51 26,54" \
+            -fill "#0049B8" -draw "circle 46,51 46,54" \
+            -fill "#0049B8" -draw "line 36,18 36,40" \
+            -fill "#0049B8" -draw "line 26,40 46,40" \
+            -fill "#0049B8" -draw "line 26,40 26,51" \
+            -fill "#0049B8" -draw "line 46,40 46,51" \
             app/src/main/res/mipmap-hdpi/ic_launcher.png
     
     cp app/src/main/res/mipmap-hdpi/ic_launcher.png app/src/main/res/mipmap-hdpi/ic_launcher_round.png
     
     # xhdpi (96x96)
     convert -size 96x96 xc:"#0049B8" \
-            -fill white -stroke white -strokewidth 2 \
-            -draw "circle 48,28 48,36" \
-            -draw "circle 32,72 32,80" \
-            -draw "circle 64,72 64,80" \
-            -draw "line 48,36 48,56" \
-            -draw "line 32,56 64,56" \
-            -draw "line 32,56 32,72" \
-            -draw "line 64,56 64,72" \
+            -fill white -draw "roundrectangle 16,14 80,82 4,4" \
+            -fill "#0049B8" -draw "rectangle 23,24 71,28" \
+            -fill "#0049B8" -draw "rectangle 23,34 71,38" \
+            -fill "#0049B8" -draw "rectangle 23,44 56,48" \
+            -fill "#0049B8" -draw "circle 48,20 48,24" \
+            -fill "#0049B8" -draw "circle 35,68 35,72" \
+            -fill "#0049B8" -draw "circle 61,68 61,72" \
+            -fill "#0049B8" -draw "line 48,24 48,53" \
+            -fill "#0049B8" -draw "line 35,53 61,53" \
+            -fill "#0049B8" -draw "line 35,53 35,68" \
+            -fill "#0049B8" -draw "line 61,53 61,68" \
             app/src/main/res/mipmap-xhdpi/ic_launcher.png
     
     cp app/src/main/res/mipmap-xhdpi/ic_launcher.png app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
     
     # xxhdpi (144x144)
     convert -size 144x144 xc:"#0049B8" \
-            -fill white -stroke white -strokewidth 3 \
-            -draw "circle 72,42 72,54" \
-            -draw "circle 48,108 48,120" \
-            -draw "circle 96,108 96,120" \
-            -draw "line 72,54 72,84" \
-            -draw "line 48,84 96,84" \
-            -draw "line 48,84 48,108" \
-            -draw "line 96,84 96,108" \
+            -fill white -draw "roundrectangle 24,21 120,123 6,6" \
+            -fill "#0049B8" -draw "rectangle 34,36 106,42" \
+            -fill "#0049B8" -draw "rectangle 34,51 106,57" \
+            -fill "#0049B8" -draw "rectangle 34,66 84,72" \
+            -fill "#0049B8" -draw "circle 72,30 72,36" \
+            -fill "#0049B8" -draw "circle 52,102 52,108" \
+            -fill "#0049B8" -draw "circle 92,102 92,108" \
+            -fill "#0049B8" -draw "line 72,36 72,80" \
+            -fill "#0049B8" -draw "line 52,80 92,80" \
+            -fill "#0049B8" -draw "line 52,80 52,102" \
+            -fill "#0049B8" -draw "line 92,80 92,102" \
             app/src/main/res/mipmap-xxhdpi/ic_launcher.png
     
     cp app/src/main/res/mipmap-xxhdpi/ic_launcher.png app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
     
     # xxxhdpi (192x192)
     convert -size 192x192 xc:"#0049B8" \
-            -fill white -stroke white -strokewidth 4 \
-            -draw "circle 96,56 96,72" \
-            -draw "circle 64,144 64,160" \
-            -draw "circle 128,144 128,160" \
-            -draw "line 96,72 96,112" \
-            -draw "line 64,112 128,112" \
-            -draw "line 64,112 64,144" \
-            -draw "line 128,112 128,144" \
+            -fill white -draw "roundrectangle 32,28 160,164 8,8" \
+            -fill "#0049B8" -draw "rectangle 45,48 141,56" \
+            -fill "#0049B8" -draw "rectangle 45,68 141,76" \
+            -fill "#0049B8" -draw "rectangle 45,88 112,96" \
+            -fill "#0049B8" -draw "circle 96,40 96,48" \
+            -fill "#0049B8" -draw "circle 69,136 69,144" \
+            -fill "#0049B8" -draw "circle 123,136 123,144" \
+            -fill "#0049B8" -draw "line 96,48 96,107" \
+            -fill "#0049B8" -draw "line 69,107 123,107" \
+            -fill "#0049B8" -draw "line 69,107 69,136" \
+            -fill "#0049B8" -draw "line 123,107 123,136" \
             app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
     
     cp app/src/main/res/mipmap-xxxhdpi/ic_launcher.png app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
