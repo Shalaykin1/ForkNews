@@ -12,6 +12,9 @@ interface RepositoryDao {
     @Query("SELECT * FROM repositories ORDER BY position ASC, id DESC")
     suspend fun getAllRepositoriesList(): List<Repository>
     
+    @Query("SELECT COUNT(*) FROM repositories")
+    suspend fun getRepositoryCount(): Int
+    
     @Query("SELECT * FROM repositories WHERE id = :id")
     suspend fun getRepositoryById(id: Long): Repository?
     

@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: RepositoryAdapter
     private val handler = Handler(Looper.getMainLooper())
     private var autoRefreshRunnable: Runnable? = null
+    private var mainMenu: Menu? = null
     
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -81,6 +82,9 @@ class MainActivity : AppCompatActivity() {
         requestBatteryOptimizationExemption()
         requestFullScreenNotificationPermission()
         
+        // Инициализировать репозитории по умолчанию
+        initDefaultRepositoriesIfNeeded()
+        
         // Запустить фоновую проверку обновлений (каждые 5 минут)
         com.forknews.workers.UpdateCheckWorker.schedulePeriodicWork(this, 5L)
     }
@@ -117,6 +121,8 @@ class MainActivity : AppCompatActivity() {
     
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
+        mainMenu = menu
+        updateSoundIcon()
         return true
     }
     
@@ -140,6 +146,19 @@ class MainActivity : AppCompatActivity() {
             PreferencesManager.setNotificationSoundEnabled(!currentSound)
             val status = if (!currentSound) "включен" else "отключен"
             Toast.makeText(this@MainActivity, "Звук уведомлений $status", Toast.LENGTH_SHORT).show()
+            updateSoundIcon()
+        }
+    }
+    
+    private fun updateSoundIcon() {
+        lifecycleScope.launch {
+            val soundEnabled = PreferencesManager.getNotificationSoundEnabled().first()
+            val iconRes = if (soundEnabled) {
+                android.R.drawable.ic_lock_silent_mode_off
+            } else {
+                android.R.drawable.ic_lock_silent_mode
+            }
+            mainMenu?.findItem(R.id.action_sound)?.setIcon(iconRes)
         }
     }
     
@@ -361,6 +380,24 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         } catch (e: Exception) {
             Toast.makeText(this, "Не удалось открыть ссылку", Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    private fun initDefaultRepositoriesIfNeeded() {
+        lifecycleScope.launch {
+            val count = viewModel.getRepositoryCount()
+            if (count == 0) {
+                val defaultRepos = listOf(
+                    "https://github.com/coffincolors/winlator/",
+                    "https://github.com/StevenMXZ/Winlator-Ludashi/",
+                    "https://github.com/brunodev85/winlator/",
+                    "https://github.com/K11MCH1/AdrenoToolsDrivers/"
+                )
+                defaultRepos.forEach { url ->
+                    viewModel.addRepository(url)
+                }
+                DiagnosticLogger.log("MainActivity", "Добавлено ${defaultRepos.size} репозиториев по умолчанию")
+            }
         }
     }
 }

@@ -84,6 +84,10 @@ class MainViewModel(
         }
     }
     
+    suspend fun getRepositoryCount(): Int {
+        return repository.getRepositoryCount()
+    }
+    
     private fun parseRepositoryUrl(url: String): Repository? {
         // Parse GitHub URL like https://github.com/owner/repo
         val githubRegex = Regex("""github\.com/([^/]+)/([^/]+)""")

@@ -17,6 +17,10 @@ class RepositoryRepository(
         return repositoryDao.getAllRepositoriesList()
     }
     
+    suspend fun getRepositoryCount(): Int {
+        return repositoryDao.getRepositoryCount()
+    }
+    
     suspend fun addRepository(repository: Repository): Long {
         return repositoryDao.insertRepository(repository)
     }
