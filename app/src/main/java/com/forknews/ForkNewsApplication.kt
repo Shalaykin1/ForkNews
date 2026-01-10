@@ -3,7 +3,7 @@ package com.forknews
 import android.app.Application
 import android.content.Context
 import com.forknews.utils.PreferencesManager
-import com.forknews.workers.UpdateCheckWorker
+import com.forknews.utils.AlarmScheduler
 
 class ForkNewsApplication : Application() {
     
@@ -13,15 +13,15 @@ class ForkNewsApplication : Application() {
         // Initialize PreferencesManager
         PreferencesManager.init(this)
         
-        // Initialize WorkManager
-        initWorkManager()
+        // Initialize AlarmManager for 5-minute checks
+        initAlarmScheduler()
     }    
 
     
-    private fun initWorkManager() {
+    private fun initAlarmScheduler() {
         try {
-            // Schedule periodic update checks (5 minutes)
-            UpdateCheckWorker.schedulePeriodicWork(this, 5L)
+            // Schedule exact 5-minute alarm
+            AlarmScheduler.scheduleAlarm(this)
         } catch (e: Exception) {
             e.printStackTrace()
         }

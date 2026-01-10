@@ -85,8 +85,8 @@ class MainActivity : AppCompatActivity() {
         // Инициализировать репозитории по умолчанию
         initDefaultRepositoriesIfNeeded()
         
-        // Запустить фоновую проверку обновлений (каждые 5 минут)
-        com.forknews.workers.UpdateCheckWorker.schedulePeriodicWork(this, 5L)
+        // Запустить фоновую проверку обновлений через AlarmManager (точно каждые 5 минут)
+        com.forknews.utils.AlarmScheduler.scheduleAlarm(this)
     }
     
     override fun onResume() {
