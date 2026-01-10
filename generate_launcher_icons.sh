@@ -12,13 +12,11 @@ if command -v convert &> /dev/null; then
     # mdpi (48x48)
     convert -size 48x48 xc:"#0049B8" \
             -fill white \
-            -draw "rectangle 16,12 18,22" \
-            -draw "rectangle 20,12 22,22" \
-            -draw "rectangle 24,12 26,22" \
-            -draw "rectangle 28,12 30,22" \
-            -draw "rectangle 15,11 31,12" \
-            -draw "rectangle 21,22 23,24" \
-            -draw "rectangle 22,24 23,31" \
+            -draw "rectangle 23,10 25,12" \
+            -draw "path 'M 20,12 L 28,12 L 29,20 Q 29,22 27,23 L 21,23 Q 19,22 19,20 Z'" \
+            -draw "rectangle 23,23 25,25" \
+            -draw "path 'M 16,14 L 17,14 Q 18,16 17,18 L 16,18 Q 15,16 16,14 Z'" \
+            -draw "path 'M 31,14 L 32,14 Q 33,16 32,18 L 31,18 Q 30,16 31,14 Z'" \
             -font DejaVu-Sans-Bold -pointsize 7 \
             -gravity South -annotate +0+5 "ForkNews" \
             app/src/main/res/mipmap-mdpi/ic_launcher.png
@@ -28,13 +26,11 @@ if command -v convert &> /dev/null; then
     # hdpi (72x72)
     convert -size 72x72 xc:"#0049B8" \
             -fill white \
-            -draw "rectangle 24,17 30,33" \
-            -draw "rectangle 30,17 36,33" \
-            -draw "rectangle 36,17 42,33" \
-            -draw "rectangle 42,17 48,33" \
-            -draw "rectangle 22,16 50,18" \
-            -draw "rectangle 31,33 35,36" \
-            -draw "rectangle 33,36 34,46" \
+            -draw "rectangle 35,15 37,18" \
+            -draw "path 'M 30,18 L 42,18 L 44,30 Q 44,33 41,35 L 31,35 Q 28,33 28,30 Z'" \
+            -draw "rectangle 35,35 37,38" \
+            -draw "path 'M 24,21 L 26,21 Q 27,24 26,27 L 24,27 Q 23,24 24,21 Z'" \
+            -draw "path 'M 46,21 L 48,21 Q 49,24 48,27 L 46,27 Q 45,24 46,21 Z'" \
             -font DejaVu-Sans-Bold -pointsize 10 \
             -gravity South -annotate +0+7 "ForkNews" \
             app/src/main/res/mipmap-hdpi/ic_launcher.png
@@ -44,13 +40,13 @@ if command -v convert &> /dev/null; then
     # xhdpi (96x96)
     convert -size 96x96 xc:"#0049B8" \
             -fill white \
-            -draw "rectangle 32,23 36,43" \
-            -draw "rectangle 40,23 44,43" \
-            -draw "rectangle 48,23 52,43" \
-            -draw "rectangle 56,23 60,43" \
-            -draw "rectangle 30,21 62,24" \
-            -draw "rectangle 42,43 46,47" \
-            -draw "rectangle 44,47 45,61" \
+            -draw "rectangle 46,20 50,24" \
+            -draw "path 'M 40,24 L 56,24 L 59,40 Q 59,44 55,46 L 41,46 Q 37,44 37,40 Z'" \
+            -draw "rectangle 46,46 50,50" \
+            -draw "path 'M 32,28 L 34,28 Q 36,32 34,36 L 32,36 Q 30,32 32,28 Z'" \
+            -draw "path 'M 62,28 L 64,28 Q 66,32 64,36 L 62,36 Q 60,32 62,28 Z'" \
+            -font DejaVu-Sans-Bold -pointsize 13 \
+            -gravity South -annotate +0+10 "ForkNews" \
             -font DejaVu-Sans-Bold -pointsize 13 \
             -gravity South -annotate +0+10 "ForkNews" \
             app/src/main/res/mipmap-xhdpi/ic_launcher.png
@@ -60,13 +56,11 @@ if command -v convert &> /dev/null; then
     # xxhdpi (144x144)
     convert -size 144x144 xc:"#0049B8" \
             -fill white \
-            -draw "rectangle 48,35 54,65" \
-            -draw "rectangle 60,35 66,65" \
-            -draw "rectangle 72,35 78,65" \
-            -draw "rectangle 84,35 90,65" \
-            -draw "rectangle 45,32 93,37" \
-            -draw "rectangle 63,65 69,71" \
-            -draw "rectangle 66,71 68,92" \
+            -draw "rectangle 70,30 74,36" \
+            -draw "path 'M 60,36 L 84,36 L 88,60 Q 88,66 82,69 L 62,69 Q 56,66 56,60 Z'" \
+            -draw "rectangle 70,69 74,75" \
+            -draw "path 'M 48,42 L 51,42 Q 54,48 51,54 L 48,54 Q 45,48 48,42 Z'" \
+            -draw "path 'M 93,42 L 96,42 Q 99,48 96,54 L 93,54 Q 90,48 93,42 Z'" \
             -font DejaVu-Sans-Bold -pointsize 19 \
             -gravity South -annotate +0+15 "ForkNews" \
             app/src/main/res/mipmap-xxhdpi/ic_launcher.png
@@ -76,13 +70,11 @@ if command -v convert &> /dev/null; then
     # xxxhdpi (192x192)
     convert -size 192x192 xc:"#0049B8" \
             -fill white \
-            -draw "rectangle 64,47 72,87" \
-            -draw "rectangle 80,47 88,87" \
-            -draw "rectangle 96,47 104,87" \
-            -draw "rectangle 112,47 120,87" \
-            -draw "rectangle 60,43 124,49" \
-            -draw "rectangle 84,87 92,95" \
-            -draw "rectangle 88,95 90,122" \
+            -draw "rectangle 93,40 99,48" \
+            -draw "path 'M 80,48 L 112,48 L 117,80 Q 117,88 109,92 L 83,92 Q 75,88 75,80 Z'" \
+            -draw "rectangle 93,92 99,100" \
+            -draw "path 'M 64,56 L 68,56 Q 72,64 68,72 L 64,72 Q 60,64 64,56 Z'" \
+            -draw "path 'M 124,56 L 128,56 Q 132,64 128,72 L 124,72 Q 120,64 124,56 Z'" \
             -font DejaVu-Sans-Bold -pointsize 25 \
             -gravity South -annotate +0+20 "ForkNews" \
             -font DejaVu-Sans-Bold -pointsize 26 \
