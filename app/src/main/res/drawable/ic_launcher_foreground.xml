@@ -1,0 +1,81 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Фон остаётся прозрачным для adaptive icon -->
+    
+    <!-- Fork icon (Git style) -->
+    <!-- Верхний узел -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,18
+                         a8,8 0 1,0 0,16
+                         a8,8 0 1,0 0,-16z"/>
+    
+    <!-- Левый нижний узел -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M34,74
+                         a8,8 0 1,0 0,16
+                         a8,8 0 1,0 0,-16z"/>
+    
+    <!-- Правый нижний узел -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M74,74
+                         a8,8 0 1,0 0,16
+                         a8,8 0 1,0 0,-16z"/>
+    
+    <!-- Центральная линия от верхнего узла -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M51,34
+                         L51,54
+                         L54,54
+                         L54,34
+                         Z"/>
+    
+    <!-- Развилка влево -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M37,54
+                         L37,74
+                         L40,74
+                         L40,54
+                         Z"/>
+    
+    <!-- Развилка вправо -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M71,54
+                         L71,74
+                         L74,74
+                         L74,54
+                         Z"/>
+    
+    <!-- Горизонтальная линия развилки -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M37,52
+                         L74,52
+                         L74,56
+                         L37,56
+                         Z"/>
+    
+    <!-- Буква N (News) в центре -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M45,60
+                         L48,60
+                         L48,68
+                         L56,60
+                         L59,60
+                         L59,76
+                         L56,76
+                         L56,68
+                         L48,76
+                         L45,76
+                         Z"/>
+</vector>
