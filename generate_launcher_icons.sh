@@ -12,13 +12,14 @@ if command -v convert &> /dev/null; then
     # mdpi (48x48)
     convert -size 48x48 xc:"#0049B8" \
             -fill white \
-            -draw "rectangle 20,10 28,30" \
-            -draw "rectangle 15,10 17,20" \
-            -draw "rectangle 18,10 20,20" \
-            -draw "rectangle 21,10 23,20" \
-            -draw "rectangle 24,10 26,20" \
-            -draw "rectangle 14,9 27,11" \
-            -font DejaVu-Sans-Bold -pointsize 8 \
+            -draw "rectangle 16,12 18,22" \
+            -draw "rectangle 20,12 22,22" \
+            -draw "rectangle 24,12 26,22" \
+            -draw "rectangle 28,12 30,22" \
+            -draw "rectangle 15,11 31,12" \
+            -draw "rectangle 21,22 23,24" \
+            -draw "rectangle 22,24 23,31" \
+            -font DejaVu-Sans-Bold -pointsize 7 \
             -gravity South -annotate +0+5 "ForkNews" \
             app/src/main/res/mipmap-mdpi/ic_launcher.png
     
@@ -27,14 +28,15 @@ if command -v convert &> /dev/null; then
     # hdpi (72x72)
     convert -size 72x72 xc:"#0049B8" \
             -fill white \
-            -draw "rectangle 30,15 42,45" \
-            -draw "rectangle 22,15 26,30" \
-            -draw "rectangle 27,15 31,30" \
-            -draw "rectangle 32,15 36,30" \
-            -draw "rectangle 37,15 41,30" \
-            -draw "rectangle 21,13 42,17" \
-            -font DejaVu-Sans-Bold -pointsize 11 \
-            -gravity South -annotate +0+8 "ForkNews" \
+            -draw "rectangle 24,17 30,33" \
+            -draw "rectangle 30,17 36,33" \
+            -draw "rectangle 36,17 42,33" \
+            -draw "rectangle 42,17 48,33" \
+            -draw "rectangle 22,16 50,18" \
+            -draw "rectangle 31,33 35,36" \
+            -draw "rectangle 33,36 34,46" \
+            -font DejaVu-Sans-Bold -pointsize 10 \
+            -gravity South -annotate +0+7 "ForkNews" \
             app/src/main/res/mipmap-hdpi/ic_launcher.png
     
     cp app/src/main/res/mipmap-hdpi/ic_launcher.png app/src/main/res/mipmap-hdpi/ic_launcher_round.png
@@ -42,14 +44,15 @@ if command -v convert &> /dev/null; then
     # xhdpi (96x96)
     convert -size 96x96 xc:"#0049B8" \
             -fill white \
-            -draw "rectangle 40,20 56,60" \
-            -draw "rectangle 30,20 34,40" \
-            -draw "rectangle 36,20 40,40" \
-            -draw "rectangle 43,20 47,40" \
-            -draw "rectangle 50,20 54,40" \
-            -draw "rectangle 28,18 56,22" \
-            -font DejaVu-Sans-Bold -pointsize 14 \
-            -gravity South -annotate +0+12 "ForkNews" \
+            -draw "rectangle 32,23 36,43" \
+            -draw "rectangle 40,23 44,43" \
+            -draw "rectangle 48,23 52,43" \
+            -draw "rectangle 56,23 60,43" \
+            -draw "rectangle 30,21 62,24" \
+            -draw "rectangle 42,43 46,47" \
+            -draw "rectangle 44,47 45,61" \
+            -font DejaVu-Sans-Bold -pointsize 13 \
+            -gravity South -annotate +0+10 "ForkNews" \
             app/src/main/res/mipmap-xhdpi/ic_launcher.png
     
     cp app/src/main/res/mipmap-xhdpi/ic_launcher.png app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
@@ -57,14 +60,15 @@ if command -v convert &> /dev/null; then
     # xxhdpi (144x144)
     convert -size 144x144 xc:"#0049B8" \
             -fill white \
-            -draw "rectangle 60,30 84,90" \
-            -draw "rectangle 45,30 51,60" \
-            -draw "rectangle 54,30 60,60" \
-            -draw "rectangle 64,30 70,60" \
-            -draw "rectangle 74,30 80,60" \
-            -draw "rectangle 42,27 84,33" \
-            -font DejaVu-Sans-Bold -pointsize 20 \
-            -gravity South -annotate +0+18 "ForkNews" \
+            -draw "rectangle 48,35 54,65" \
+            -draw "rectangle 60,35 66,65" \
+            -draw "rectangle 72,35 78,65" \
+            -draw "rectangle 84,35 90,65" \
+            -draw "rectangle 45,32 93,37" \
+            -draw "rectangle 63,65 69,71" \
+            -draw "rectangle 66,71 68,92" \
+            -font DejaVu-Sans-Bold -pointsize 19 \
+            -gravity South -annotate +0+15 "ForkNews" \
             app/src/main/res/mipmap-xxhdpi/ic_launcher.png
     
     cp app/src/main/res/mipmap-xxhdpi/ic_launcher.png app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
@@ -72,12 +76,15 @@ if command -v convert &> /dev/null; then
     # xxxhdpi (192x192)
     convert -size 192x192 xc:"#0049B8" \
             -fill white \
-            -draw "rectangle 80,40 112,120" \
-            -draw "rectangle 60,40 68,80" \
-            -draw "rectangle 72,40 80,80" \
-            -draw "rectangle 85,40 93,80" \
-            -draw "rectangle 98,40 106,80" \
-            -draw "rectangle 56,36 112,44" \
+            -draw "rectangle 64,47 72,87" \
+            -draw "rectangle 80,47 88,87" \
+            -draw "rectangle 96,47 104,87" \
+            -draw "rectangle 112,47 120,87" \
+            -draw "rectangle 60,43 124,49" \
+            -draw "rectangle 84,87 92,95" \
+            -draw "rectangle 88,95 90,122" \
+            -font DejaVu-Sans-Bold -pointsize 25 \
+            -gravity South -annotate +0+20 "ForkNews" \
             -font DejaVu-Sans-Bold -pointsize 26 \
             -gravity South -annotate +0+24 "ForkNews" \
             app/src/main/res/mipmap-xxxhdpi/ic_launcher.png

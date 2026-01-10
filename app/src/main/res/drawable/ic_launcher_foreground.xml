@@ -4,72 +4,84 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
     
-    <!-- Вилка (Fork) -->
+    <!-- Улучшенная столовая вилка -->
+    
+    <!-- Зубцы вилки (4 штуки) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M36,26 L40,26 L40,48 L36,48 Z"/>
+    
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M44,26 L48,26 L48,48 L44,48 Z"/>
+    
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M52,26 L56,26 L56,48 L52,48 Z"/>
+    
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M60,26 L64,26 L64,48 L60,48 Z"/>
+    
+    <!-- Основание вилки (соединяет зубцы) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M34,24 L66,24 L66,28 L34,28 Z"/>
+    
+    <!-- Переход к ручке -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M46,48 L54,48 L54,52 L46,52 Z"/>
+    
     <!-- Ручка вилки -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M50,50 L50,75 L58,75 L58,50 Z"/>
+        android:pathData="M48,52 L52,52 L52,68 L48,68 Z"/>
     
-    <!-- Зубцы вилки -->
+    <!-- Закругление ручки снизу -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M38,30 L42,30 L42,50 L38,50 Z"/>
+        android:pathData="M48,66 L48,68 A2,2 0 0,0 52,68 L52,66 Z"/>
     
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M46,30 L50,30 L50,50 L46,50 Z"/>
+    <!-- Текст "ForkNews" (улучшенный шрифт) -->
     
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M54,30 L58,30 L58,50 L54,50 Z"/>
-    
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M62,30 L66,30 L66,50 L62,50 Z"/>
-    
-    <!-- Основание вилки -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M36,28 L68,28 L68,32 L36,32 Z"/>
-    
-    <!-- Текст "ForkNews" -->
     <!-- F -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M20,78 L20,88 L23,88 L23,84 L28,84 L28,81 L23,81 L23,81 L28,81 L28,78 Z"/>
+        android:pathData="M18,76 L18,88 L22,88 L22,83 L28,83 L28,80 L22,80 L22,79 L29,79 L29,76 Z"/>
     
     <!-- o -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M30,81 a3,3 0 1,1 0,6 a3,3 0 1,1 0,-6 M30,82.5 a1.5,1.5 0 1,0 0,3 a1.5,1.5 0 1,0 0,-3 Z"/>
+        android:pathData="M32,79 a4,4 0 1,1 0,8 a4,4 0 1,1 0,-8 M32,81 a2,2 0 1,0 0,4 a2,2 0 1,0 0,-4 Z"/>
     
     <!-- r -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M37,81 L37,87 L39.5,87 L39.5,82.5 L41,82.5 L41,81 Z"/>
+        android:pathData="M39,79 L39,87 L42,87 L42,81 L45,81 L45,79 Z"/>
     
     <!-- k -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M43,78 L43,87 L45.5,87 L45.5,84 L47,87 L50,87 L47.5,83.5 L50,81 L47,81 L45.5,83 L45.5,78 Z"/>
+        android:pathData="M48,76 L48,87 L51,87 L51,83.5 L53,87 L57,87 L54,82.5 L57,79 L53,79 L51,82 L51,76 Z"/>
     
     <!-- N -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M52,81 L52,87 L54.5,87 L54.5,84 L57,87 L59.5,87 L59.5,81 L57,81 L57,84 L54.5,81 Z"/>
+        android:pathData="M60,79 L60,87 L63,87 L63,83 L67,87 L70,87 L70,79 L67,79 L67,83 L63,79 Z"/>
     
     <!-- e -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M62,83.5 L67,83.5 L67,82.5 a3,3 0 1,0 -6,0 a3,3 0 1,0 6,0 M62.5,84.5 L62.5,85 a1.5,1.5 0 1,0 3,0 L65.5,84.5 Z"/>
+        android:pathData="M73,82 L80,82 L80,81 a3.5,3.5 0 1,0 -7,0 a3.5,3.5 0 1,0 7,0 M74,83.5 L74,84.5 a2,2 0 1,0 4,0 L78,83.5 Z"/>
     
     <!-- w -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M69,81 L69,87 L71,87 L72,84 L73,87 L75,87 L75,81 L73,81 L73,84.5 L72,81.5 L72,81.5 L71,84.5 L71,81 Z"/>
+        android:pathData="M83,79 L83,87 L85.5,87 L87,83 L88.5,87 L91,87 L91,79 L88.5,79 L88.5,84 L87,79.5 L87,79.5 L85.5,84 L85.5,79 Z"/>
     
     <!-- s -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M77,81.5 L81,81.5 L81,81 L77,81 a1.5,1.5 0 0,0 0,3 L81,84 a1.5,1.5 0 0,1 0,3 L77,87 L77,86.5 L81,86.5 Z"/>
+        android:pathData="M93.5,80 L98,80 L98,79 L93,79 a2,2 0 0,0 0,4 L98,83 a2,2 0 0,1 0,4 L93,87 L93,86 L98,86 Z"/>
 </vector>
