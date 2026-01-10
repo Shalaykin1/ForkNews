@@ -86,6 +86,7 @@ class MainActivity : AppCompatActivity() {
         observeData()
         requestNotificationPermission()
         requestBatteryOptimizationExemption()
+        requestFullScreenNotificationPermission()
         
         // Инициализируем предустановленные репозитории при первом запуске
         DiagnosticLogger.log("MainActivity", "Вызов initDefaultRepositoriesIfNeeded()")
@@ -231,6 +232,35 @@ class MainActivity : AppCompatActivity() {
                     // Request permission directly
                     requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                 }
+            }
+        }
+    }
+    
+    private fun requestFullScreenNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 14+
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+            
+            if (!notificationManager.canUseFullScreenIntent()) {
+                DiagnosticLogger.log("MainActivity", "Запрос разрешения USE_FULL_SCREEN_INTENT")
+                MaterialAlertDialogBuilder(this)
+                    .setTitle("Всплывающие уведомления")
+                    .setMessage("Для показа всплывающих уведомлений поверх других приложений требуется специальное разрешение.\n\nЭто позволит вам сразу видеть уведомления о новых релизах, не открывая шторку.")
+                    .setPositiveButton("Разрешить") { _, _ ->
+                        try {
+                            val intent = Intent(android.provider.Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT).apply {
+                                data = Uri.parse("package:$packageName")
+                            }
+                            startActivity(intent)
+                            DiagnosticLogger.log("MainActivity", "Открыт экран настроек fullscreen intent")
+                        } catch (e: Exception) {
+                            DiagnosticLogger.error("MainActivity", "Ошибка открытия настроек fullscreen: ${e.message}", e)
+                            Toast.makeText(this, "Не удалось открыть настройки", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .setNegativeButton("Позже", null)
+                    .show()
+            } else {
+                DiagnosticLogger.log("MainActivity", "Разрешение USE_FULL_SCREEN_INTENT уже предоставлено")
             }
         }
     }
