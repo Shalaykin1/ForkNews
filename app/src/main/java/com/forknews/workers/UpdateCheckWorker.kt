@@ -15,6 +15,7 @@ import com.forknews.data.local.AppDatabase
 import com.forknews.data.repository.RepositoryRepository
 import com.forknews.utils.PreferencesManager
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
@@ -104,13 +105,6 @@ class UpdateCheckWorker(
         return try {
             com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "=== WORKER ЗАПУЩЕН ===")
             PreferencesManager.init(applicationContext)
-            val notificationsEnabled = PreferencesManager.getNotificationsEnabled().first()
-            com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "Уведомления включены: $notificationsEnabled")
-            
-            if (!notificationsEnabled) {
-                com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "Уведомления отключены в настройках, выход")
-                return Result.success()
-            }
             
             val database = Room.databaseBuilder(
                 applicationContext,
@@ -239,7 +233,12 @@ class UpdateCheckWorker(
         
         val soundUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
         
-        val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+        // Проверяем настройку звука
+        val soundEnabled = runBlocking {
+            PreferencesManager.getNotificationSoundEnabled().first()
+        }
+        
+        val notificationBuilder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("🔔 $repoName: новый релиз")
             .setContentText(releaseName)
@@ -253,15 +252,22 @@ class UpdateCheckWorker(
             .setOnlyAlertOnce(false)
             .setShowWhen(true)
             .setWhen(System.currentTimeMillis())
-            .setSound(soundUri)
             .setVibrate(longArrayOf(0, 500, 200, 500))
             .setLights(android.graphics.Color.BLUE, 1000, 1000)
-            .setDefaults(0) // Отключаем DEFAULT_ALL чтобы использовать наши настройки
-            .setTimeoutAfter(30000) // Показывать 30 секунд
-            .build()
+            .setDefaults(0)
+            .setTimeoutAfter(30000)
         
-        // Добавляем флаги для звука и всплывающих окон
-        notification.flags = notification.flags or android.app.Notification.FLAG_INSISTENT
+        // Добавляем звук только если включен
+        if (soundEnabled) {
+            notificationBuilder.setSound(soundUri)
+        }
+        
+        val notification = notificationBuilder.build()
+        
+        // Добавляем флаги для всплывающих окон (FLAG_INSISTENT только если звук включен)
+        if (soundEnabled) {
+            notification.flags = notification.flags or android.app.Notification.FLAG_INSISTENT
+        }
         
         try {
             notificationManager.notify(id, notification)

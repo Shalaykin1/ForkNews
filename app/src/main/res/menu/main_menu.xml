@@ -7,12 +7,8 @@
         android:title="@string/add_repository"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_diagnostic"
-        android:title="?"
-        app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/action_settings"
-        android:icon="@android:drawable/ic_menu_preferences"
-        android:title="@string/settings"
+        android:id="@+id/action_sound"
+        android:icon="@android:drawable/ic_lock_silent_mode_off"
+        android:title="Звук"
         app:showAsAction="ifRoom" />
 </menu>

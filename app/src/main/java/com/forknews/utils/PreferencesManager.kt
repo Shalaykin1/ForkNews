@@ -15,105 +15,23 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 object PreferencesManager {
     private lateinit var context: Context
     
-    private val CHECK_INTERVAL_KEY = longPreferencesKey("check_interval")
-    private val USE_SYSTEM_THEME_KEY = booleanPreferencesKey("use_system_theme")
-    private val DARK_THEME_KEY = booleanPreferencesKey("dark_theme")
-    private val NOTIFICATIONS_ENABLED_KEY = booleanPreferencesKey("notifications_enabled")
-    private val CUSTOM_TIME_ENABLED_KEY = booleanPreferencesKey("custom_time_enabled")
-    private val CUSTOM_TIME_HOUR_KEY = intPreferencesKey("custom_time_hour")
-    private val CUSTOM_TIME_MINUTE_KEY = intPreferencesKey("custom_time_minute")
+    private val NOTIFICATION_SOUND_ENABLED_KEY = booleanPreferencesKey("notification_sound_enabled")
     private val GITHUB_TOKEN_KEY = stringPreferencesKey("github_token")
     
     fun init(context: Context) {
         this.context = context.applicationContext
     }
     
-    // Check interval (in minutes)
-    suspend fun setCheckInterval(minutes: Long) {
+    // Notification sound
+    suspend fun setNotificationSoundEnabled(enabled: Boolean) {
         context.dataStore.edit { preferences ->
-            preferences[CHECK_INTERVAL_KEY] = minutes
+            preferences[NOTIFICATION_SOUND_ENABLED_KEY] = enabled
         }
     }
     
-    fun getCheckInterval(): Flow<Long> {
+    fun getNotificationSoundEnabled(): Flow<Boolean> {
         return context.dataStore.data.map { preferences ->
-            preferences[CHECK_INTERVAL_KEY] ?: 5L // Default 5 minutes
-        }
-    }
-    
-    suspend fun getCheckIntervalSync(): Long {
-        return runBlocking {
-            getCheckInterval().first()
-        }
-    }
-    
-    // Theme settings
-    suspend fun setUseSystemTheme(useSystem: Boolean) {
-        context.dataStore.edit { preferences ->
-            preferences[USE_SYSTEM_THEME_KEY] = useSystem
-        }
-    }
-    
-    fun getUseSystemTheme(): Flow<Boolean> {
-        return context.dataStore.data.map { preferences ->
-            preferences[USE_SYSTEM_THEME_KEY] ?: true
-        }
-    }
-    
-    suspend fun setDarkTheme(isDark: Boolean) {
-        context.dataStore.edit { preferences ->
-            preferences[DARK_THEME_KEY] = isDark
-        }
-    }
-    
-    fun getDarkTheme(): Flow<Boolean> {
-        return context.dataStore.data.map { preferences ->
-            preferences[DARK_THEME_KEY] ?: false
-        }
-    }
-    
-    // Notifications
-    suspend fun setNotificationsEnabled(enabled: Boolean) {
-        context.dataStore.edit { preferences ->
-            preferences[NOTIFICATIONS_ENABLED_KEY] = enabled
-        }
-    }
-    
-    fun getNotificationsEnabled(): Flow<Boolean> {
-        return context.dataStore.data.map { preferences ->
-            preferences[NOTIFICATIONS_ENABLED_KEY] ?: true
-        }
-    }
-    
-    // Custom time settings
-    suspend fun setCustomTimeEnabled(enabled: Boolean) {
-        context.dataStore.edit { preferences ->
-            preferences[CUSTOM_TIME_ENABLED_KEY] = enabled
-        }
-    }
-    
-    fun getCustomTimeEnabled(): Flow<Boolean> {
-        return context.dataStore.data.map { preferences ->
-            preferences[CUSTOM_TIME_ENABLED_KEY] ?: false
-        }
-    }
-    
-    suspend fun setCustomTime(hour: Int, minute: Int) {
-        context.dataStore.edit { preferences ->
-            preferences[CUSTOM_TIME_HOUR_KEY] = hour
-            preferences[CUSTOM_TIME_MINUTE_KEY] = minute
-        }
-    }
-    
-    fun getCustomTimeHour(): Flow<Int> {
-        return context.dataStore.data.map { preferences ->
-            preferences[CUSTOM_TIME_HOUR_KEY] ?: 9
-        }
-    }
-    
-    fun getCustomTimeMinute(): Flow<Int> {
-        return context.dataStore.data.map { preferences ->
-            preferences[CUSTOM_TIME_MINUTE_KEY] ?: 0
+            preferences[NOTIFICATION_SOUND_ENABLED_KEY] ?: true // Default enabled
         }
     }
     
@@ -133,22 +51,6 @@ object PreferencesManager {
     fun getGitHubTokenSync(): String {
         return runBlocking {
             getGitHubToken().first()
-        }
-    }
-    
-    // Apply theme
-    fun applyTheme() {
-        runBlocking {
-            val useSystem = getUseSystemTheme().first()
-            if (useSystem) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-            } else {
-                val isDark = getDarkTheme().first()
-                AppCompatDelegate.setDefaultNightMode(
-                    if (isDark) AppCompatDelegate.MODE_NIGHT_YES
-                    else AppCompatDelegate.MODE_NIGHT_NO
-                )
-            }
         }
     }
 }

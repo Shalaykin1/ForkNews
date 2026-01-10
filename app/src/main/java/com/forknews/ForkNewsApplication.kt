@@ -13,9 +13,6 @@ class ForkNewsApplication : Application() {
         // Initialize PreferencesManager
         PreferencesManager.init(this)
         
-        // Apply saved theme
-        PreferencesManager.applyTheme()
-        
         // Initialize WorkManager
         initWorkManager()
     }    
@@ -23,8 +20,8 @@ class ForkNewsApplication : Application() {
     
     private fun initWorkManager() {
         try {
-            // Schedule periodic update checks with default interval (1 minute)
-            UpdateCheckWorker.schedulePeriodicWork(this, 1)
+            // Schedule periodic update checks (5 minutes)
+            UpdateCheckWorker.schedulePeriodicWork(this, 5L)
         } catch (e: Exception) {
             e.printStackTrace()
         }

@@ -28,7 +28,6 @@ import com.forknews.data.local.AppDatabase
 import com.forknews.data.model.Repository
 import com.forknews.data.repository.RepositoryRepository
 import com.forknews.databinding.ActivityMainBinding
-import com.forknews.ui.settings.SettingsActivity
 import com.forknews.utils.DiagnosticLogger
 import com.forknews.utils.PreferencesManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -42,7 +41,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: RepositoryAdapter
     private val handler = Handler(Looper.getMainLooper())
     private var autoRefreshRunnable: Runnable? = null
-    private var timeLogRunnable: Runnable? = null
     
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -70,12 +68,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        DiagnosticLogger.log("MainActivity", "=== ЗАПУСК ПРИЛОЖЕНИЯ ===")
-        DiagnosticLogger.log("MainActivity", "onCreate вызван")
-        
-        // Apply theme
         PreferencesManager.init(this)
-        PreferencesManager.applyTheme()
         
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -88,37 +81,22 @@ class MainActivity : AppCompatActivity() {
         requestBatteryOptimizationExemption()
         requestFullScreenNotificationPermission()
         
-        // Инициализируем предустановленные репозитории при первом запуске
-        DiagnosticLogger.log("MainActivity", "Вызов initDefaultRepositoriesIfNeeded()")
-        initDefaultRepositoriesIfNeeded()
-        
-        // Запустить фоновую проверку обновлений
-        lifecycleScope.launch {
-            val interval = PreferencesManager.getCheckInterval().first()
-            DiagnosticLogger.log("MainActivity", "Запуск WorkManager с интервалом: $interval мин")
-            com.forknews.workers.UpdateCheckWorker.schedulePeriodicWork(this@MainActivity, interval)
-        }
-        
-        // Запустить таймер логирования времени (работает в фоне)
-        startTimeLogger()
+        // Запустить фоновую проверку обновлений (каждые 5 минут)
+        com.forknews.workers.UpdateCheckWorker.schedulePeriodicWork(this, 5L)
     }
     
     override fun onResume() {
         super.onResume()
         // Запустить автообновление каждые 60 секунд когда приложение открыто
         startAutoRefresh()
+        // Проверить обновления сразу при разворачивании
+        viewModel.refreshAll()
     }
     
     override fun onPause() {
         super.onPause()
         // Остановить автообновление когда приложение свернуто
         stopAutoRefresh()
-    }
-    
-    override fun onDestroy() {
-        super.onDestroy()
-        // Остановить таймер логирования при уничтожении активности
-        stopTimeLogger()
     }
     
     private fun startAutoRefresh() {
@@ -137,24 +115,6 @@ class MainActivity : AppCompatActivity() {
         autoRefreshRunnable = null
     }
     
-    private fun startTimeLogger() {
-        stopTimeLogger() // Остановить предыдущий, если был
-        timeLogRunnable = object : Runnable {
-            override fun run() {
-                val currentTime = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault())
-                    .format(java.util.Date())
-                DiagnosticLogger.log("TimeLogger", "Текущее время: $currentTime")
-                handler.postDelayed(this, 10_000) // 10 секунд
-            }
-        }
-        handler.post(timeLogRunnable!!)
-    }
-    
-    private fun stopTimeLogger() {
-        timeLogRunnable?.let { handler.removeCallbacks(it) }
-        timeLogRunnable = null
-    }
-    
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         return true
@@ -166,15 +126,20 @@ class MainActivity : AppCompatActivity() {
                 showAddRepositoryDialog()
                 true
             }
-            R.id.action_diagnostic -> {
-                showDiagnosticDialog()
-                true
-            }
-            R.id.action_settings -> {
-                startActivity(Intent(this, SettingsActivity::class.java))
+            R.id.action_sound -> {
+                toggleNotificationSound()
                 true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+    
+    private fun toggleNotificationSound() {
+        lifecycleScope.launch {
+            val currentSound = PreferencesManager.getNotificationSoundEnabled().first()
+            PreferencesManager.setNotificationSoundEnabled(!currentSound)
+            val status = if (!currentSound) "включен" else "отключен"
+            Toast.makeText(this@MainActivity, "Звук уведомлений $status", Toast.LENGTH_SHORT).show()
         }
     }
     
@@ -390,169 +355,12 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
     
-    private fun showDiagnosticDialog() {
-        val logs = DiagnosticLogger.getAllLogs()
-        val scrollView = android.widget.ScrollView(this).apply {
-            setPadding(48, 24, 48, 24)
-        }
-        val textView = android.widget.TextView(this).apply {
-            text = logs
-            textSize = 12f
-            setTextIsSelectable(true)
-            typeface = android.graphics.Typeface.MONOSPACE
-        }
-        scrollView.addView(textView)
-        
-        MaterialAlertDialogBuilder(this)
-            .setTitle("Диагностика (${logs.lines().size} строк)")
-            .setView(scrollView)
-            .setPositiveButton("Скопировать") { _, _ ->
-                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                val clip = ClipData.newPlainText("ForkNews Diagnostic Log", logs)
-                clipboard.setPrimaryClip(clip)
-                Toast.makeText(this, "Лог скопирован в буфер обмена", Toast.LENGTH_SHORT).show()
-            }
-            .setNeutralButton("Поделиться") { _, _ ->
-                shareLogFile(logs)
-            }
-            .setNegativeButton("Очистить") { _, _ ->
-                DiagnosticLogger.clear()
-                Toast.makeText(this, "Логи очищены", Toast.LENGTH_SHORT).show()
-            }
-            .show()
-    }
-    
-    private fun shareLogFile(logs: String) {
-        try {
-            val timestamp = java.text.SimpleDateFormat("HH-mm-ss_yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
-            val fileName = "log_$timestamp.txt"
-            val file = java.io.File(cacheDir, fileName)
-            file.writeText(logs)
-            
-            val uri = androidx.core.content.FileProvider.getUriForFile(
-                this,
-                "${applicationContext.packageName}.fileprovider",
-                file
-            )
-            
-            val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_STREAM, uri)
-                putExtra(Intent.EXTRA_SUBJECT, "ForkNews Diagnostic Log")
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-            
-            startActivity(Intent.createChooser(shareIntent, "Поделиться логом"))
-        } catch (e: Exception) {
-            Toast.makeText(this, "Ошибка при создании файла: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
-    }
-    
     private fun openUrl(url: String) {
         try {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(intent)
         } catch (e: Exception) {
             Toast.makeText(this, "Не удалось открыть ссылку", Toast.LENGTH_SHORT).show()
-        }
-    }
-    
-    private fun initDefaultRepositoriesIfNeeded() {
-        lifecycleScope.launch {
-            try {
-                DiagnosticLogger.log("MainActivity", "initDefaultRepositoriesIfNeeded: начало")
-                val existingRepos = viewModel.repository.getAllRepositoriesList()
-                DiagnosticLogger.log("MainActivity", "Найдено существующих репозиториев: ${existingRepos.size}")
-                
-                // Если репозиториев меньше 8, добавляем недостающие
-                if (existingRepos.size < 8) {
-                    DiagnosticLogger.log("MainActivity", "Требуется добавить репозитории")
-                    // Список репозиториев для добавления
-                    val defaultRepos = listOf(
-                        com.forknews.data.model.Repository(
-                            name = "AdrenoToolsDrivers",
-                            owner = "K11MCH1",
-                            url = "https://github.com/K11MCH1/AdrenoToolsDrivers",
-                            type = com.forknews.data.model.RepositoryType.GITHUB,
-                            notificationsEnabled = true
-                        ),
-                        com.forknews.data.model.Repository(
-                            name = "winlator",
-                            owner = "coffincolors",
-                            url = "https://github.com/coffincolors/winlator",
-                            type = com.forknews.data.model.RepositoryType.GITHUB,
-                            notificationsEnabled = true
-                        ),
-                        com.forknews.data.model.Repository(
-                            name = "Winlator-Ludashi",
-                            owner = "StevenMXZ",
-                            url = "https://github.com/StevenMXZ/Winlator-Ludashi",
-                            type = com.forknews.data.model.RepositoryType.GITHUB,
-                            notificationsEnabled = true
-                        ),
-                        com.forknews.data.model.Repository(
-                            name = "winlator",
-                            owner = "brunodev85",
-                            url = "https://github.com/brunodev85/winlator",
-                            type = com.forknews.data.model.RepositoryType.GITHUB,
-                            notificationsEnabled = true
-                        ),
-                        com.forknews.data.model.Repository(
-                            name = "ForkNews",
-                            owner = "Shalaykin1",
-                            url = "https://github.com/Shalaykin1/ForkNews",
-                            type = com.forknews.data.model.RepositoryType.GITHUB,
-                            notificationsEnabled = true
-                        ),
-                        com.forknews.data.model.Repository(
-                            name = "purple-turnip",
-                            owner = "MrPurple666",
-                            url = "https://github.com/MrPurple666/purple-turnip",
-                            type = com.forknews.data.model.RepositoryType.GITHUB,
-                            notificationsEnabled = true
-                        ),
-                        com.forknews.data.model.Repository(
-                            name = "Releases",
-                            owner = "eden-emulator",
-                            url = "https://github.com/eden-emulator/Releases",
-                            type = com.forknews.data.model.RepositoryType.GITHUB,
-                            notificationsEnabled = true
-                        ),
-                        com.forknews.data.model.Repository(
-                            name = "aps3e",
-                            owner = "aenu1",
-                            url = "https://github.com/aenu1/aps3e",
-                            type = com.forknews.data.model.RepositoryType.GITHUB,
-                            notificationsEnabled = true
-                        )
-                    )
-                    
-                    // Добавляем только те репозитории, которых еще нет
-                    // И СРАЗУ загружаем релизы для каждого (синхронно)
-                    for (repo in defaultRepos) {
-                        val exists = existingRepos.any { it.url == repo.url }
-                        if (!exists) {
-                            DiagnosticLogger.log("MainActivity", "Добавляем репозиторий: ${repo.owner}/${repo.name}")
-                            val repoId = viewModel.repository.addRepository(repo)
-                            // ВАЖНО: Синхронно загружаем релиз для каждого репозитория
-                            val addedRepo = viewModel.repository.getRepositoryById(repoId)
-                            if (addedRepo != null) {
-                                DiagnosticLogger.log("MainActivity", "Загружаем релиз для: ${addedRepo.owner}/${addedRepo.name}")
-                                val updated = viewModel.repository.checkForUpdates(addedRepo)
-                                DiagnosticLogger.log("MainActivity", "Релиз загружен для ${addedRepo.owner}/${addedRepo.name}: updated=$updated")
-                            } else {
-                                DiagnosticLogger.error("MainActivity", "Не удалось получить репозиторий с ID: $repoId")
-                            }
-                        }
-                    }
-                    DiagnosticLogger.log("MainActivity", "initDefaultRepositoriesIfNeeded: все репозитории обработаны")
-                } else {
-                    DiagnosticLogger.log("MainActivity", "Репозитории уже инициализированы (${existingRepos.size})")
-                }
-            } catch (e: Exception) {
-                DiagnosticLogger.error("MainActivity", "Ошибка в initDefaultRepositoriesIfNeeded: ${e.message}", e)
-                e.printStackTrace()
-            }
         }
     }
 }
