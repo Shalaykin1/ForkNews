@@ -97,21 +97,26 @@ class MainActivity : AppCompatActivity() {
             DiagnosticLogger.log("MainActivity", "Запуск WorkManager с интервалом: $interval мин")
             com.forknews.workers.UpdateCheckWorker.schedulePeriodicWork(this@MainActivity, interval)
         }
+        
+        // Запустить таймер логирования времени (работает в фоне)
+        startTimeLogger()
     }
     
     override fun onResume() {
         super.onResume()
         // Запустить автообновление каждые 60 секунд когда приложение открыто
         startAutoRefresh()
-        // Запустить таймер логирования времени
-        startTimeLogger()
     }
     
     override fun onPause() {
         super.onPause()
         // Остановить автообновление когда приложение свернуто
         stopAutoRefresh()
-        // Остановить таймер логирования
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        // Остановить таймер логирования при уничтожении активности
         stopTimeLogger()
     }
     
