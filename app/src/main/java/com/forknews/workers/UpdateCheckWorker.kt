@@ -190,13 +190,20 @@ class UpdateCheckWorker(
             vibrationPattern = longArrayOf(0, 500, 200, 500)
             setShowBadge(true)
             lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
+            
+            // Обходить режим "Не беспокоить"
+            setBypassDnd(true)
+            
+            val soundUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
             setSound(
-                android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION),
+                soundUri,
                 android.media.AudioAttributes.Builder()
-                    .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION)
+                    .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
                     .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setFlags(android.media.AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
                     .build()
             )
+            
             // Для Android 13+ - принудительно включаем всплывающие уведомления
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 setBlockable(false)
@@ -221,6 +228,17 @@ class UpdateCheckWorker(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         
+        // Full screen intent для всплывающих уведомлений
+        val fullScreenIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        val fullScreenPendingIntent = PendingIntent.getActivity(
+            applicationContext,
+            id + 1000,
+            fullScreenIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        
+        val soundUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
+        
         val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("🔔 $repoName: новый релиз")
@@ -230,15 +248,20 @@ class UpdateCheckWorker(
             .setCategory(NotificationCompat.CATEGORY_MESSAGE)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentIntent(pendingIntent)
+            .setFullScreenIntent(fullScreenPendingIntent, true)
             .setAutoCancel(true)
-            .setDefaults(NotificationCompat.DEFAULT_ALL)
             .setOnlyAlertOnce(false)
             .setShowWhen(true)
             .setWhen(System.currentTimeMillis())
-            .setSound(android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION))
+            .setSound(soundUri)
             .setVibrate(longArrayOf(0, 500, 200, 500))
             .setLights(android.graphics.Color.BLUE, 1000, 1000)
+            .setDefaults(0) // Отключаем DEFAULT_ALL чтобы использовать наши настройки
+            .setTimeoutAfter(30000) // Показывать 30 секунд
             .build()
+        
+        // Добавляем флаги для звука и всплывающих окон
+        notification.flags = notification.flags or android.app.Notification.FLAG_INSISTENT
         
         try {
             notificationManager.notify(id, notification)
