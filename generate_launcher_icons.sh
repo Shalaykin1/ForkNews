@@ -12,13 +12,11 @@ if command -v convert &> /dev/null; then
     # mdpi (48x48)
     convert -size 48x48 xc:"#0049B8" \
             -fill white \
-            -draw "rectangle 23,10 25,12" \
-            -draw "path 'M 20,12 L 28,12 L 29,20 Q 29,22 27,23 L 21,23 Q 19,22 19,20 Z'" \
-            -draw "rectangle 23,23 25,25" \
-            -draw "path 'M 16,14 L 17,14 Q 18,16 17,18 L 16,18 Q 15,16 16,14 Z'" \
-            -draw "path 'M 31,14 L 32,14 Q 33,16 32,18 L 31,18 Q 30,16 31,14 Z'" \
-            -font DejaVu-Sans-Bold -pointsize 7 \
-            -gravity South -annotate +0+5 "ForkNews" \
+            -draw "rectangle 6,15 7,19" -draw "rectangle 8,15 9,19" -draw "rectangle 10,15 11,19" -draw "rectangle 12,15 13,19" \
+            -draw "rectangle 5,15 13,16" -draw "rectangle 8,19 11,24" \
+            -font DejaVu-Sans-Bold -pointsize 9 -gravity West -annotate +14+0 "ForkNews" \
+            -fill none -stroke white -strokewidth 1.5 -draw "path 'M 14,33 Q 20,32 26,33 Q 32,34 38,33'" \
+            -fill white -draw "path 'M 38,33 L 40,29 L 41,34 Z'" \
             app/src/main/res/mipmap-mdpi/ic_launcher.png
     
     cp app/src/main/res/mipmap-mdpi/ic_launcher.png app/src/main/res/mipmap-mdpi/ic_launcher_round.png
@@ -26,13 +24,11 @@ if command -v convert &> /dev/null; then
     # hdpi (72x72)
     convert -size 72x72 xc:"#0049B8" \
             -fill white \
-            -draw "rectangle 35,15 37,18" \
-            -draw "path 'M 30,18 L 42,18 L 44,30 Q 44,33 41,35 L 31,35 Q 28,33 28,30 Z'" \
-            -draw "rectangle 35,35 37,38" \
-            -draw "path 'M 24,21 L 26,21 Q 27,24 26,27 L 24,27 Q 23,24 24,21 Z'" \
-            -draw "path 'M 46,21 L 48,21 Q 49,24 48,27 L 46,27 Q 45,24 46,21 Z'" \
-            -font DejaVu-Sans-Bold -pointsize 10 \
-            -gravity South -annotate +0+7 "ForkNews" \
+            -draw "rectangle 9,23 11,28" -draw "rectangle 12,23 14,28" -draw "rectangle 15,23 17,28" -draw "rectangle 18,23 20,28" \
+            -draw "rectangle 8,22 21,24" -draw "rectangle 12,28 17,36" \
+            -font DejaVu-Sans-Bold -pointsize 13 -gravity West -annotate +21-1 "ForkNews" \
+            -fill none -stroke white -strokewidth 2 -draw "path 'M 21,49 Q 30,47 39,49 Q 48,51 57,49'" \
+            -fill white -draw "path 'M 57,49 L 60,43 L 62,50 Z'" \
             app/src/main/res/mipmap-hdpi/ic_launcher.png
     
     cp app/src/main/res/mipmap-hdpi/ic_launcher.png app/src/main/res/mipmap-hdpi/ic_launcher_round.png
@@ -40,15 +36,11 @@ if command -v convert &> /dev/null; then
     # xhdpi (96x96)
     convert -size 96x96 xc:"#0049B8" \
             -fill white \
-            -draw "rectangle 46,20 50,24" \
-            -draw "path 'M 40,24 L 56,24 L 59,40 Q 59,44 55,46 L 41,46 Q 37,44 37,40 Z'" \
-            -draw "rectangle 46,46 50,50" \
-            -draw "path 'M 32,28 L 34,28 Q 36,32 34,36 L 32,36 Q 30,32 32,28 Z'" \
-            -draw "path 'M 62,28 L 64,28 Q 66,32 64,36 L 62,36 Q 60,32 62,28 Z'" \
-            -font DejaVu-Sans-Bold -pointsize 13 \
-            -gravity South -annotate +0+10 "ForkNews" \
-            -font DejaVu-Sans-Bold -pointsize 13 \
-            -gravity South -annotate +0+10 "ForkNews" \
+            -draw "rectangle 12,31 15,37" -draw "rectangle 16,31 19,37" -draw "rectangle 20,31 23,37" -draw "rectangle 24,31 27,37" \
+            -draw "rectangle 11,30 28,32" -draw "rectangle 16,37 23,48" \
+            -font DejaVu-Sans-Bold -pointsize 17 -gravity West -annotate +28-1 "ForkNews" \
+            -fill none -stroke white -strokewidth 2.5 -draw "path 'M 28,66 Q 40,63 52,66 Q 64,69 76,66'" \
+            -fill white -draw "path 'M 76,66 L 80,58 L 83,67 Z'" \
             app/src/main/res/mipmap-xhdpi/ic_launcher.png
     
     cp app/src/main/res/mipmap-xhdpi/ic_launcher.png app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
@@ -56,13 +48,11 @@ if command -v convert &> /dev/null; then
     # xxhdpi (144x144)
     convert -size 144x144 xc:"#0049B8" \
             -fill white \
-            -draw "rectangle 70,30 74,36" \
-            -draw "path 'M 60,36 L 84,36 L 88,60 Q 88,66 82,69 L 62,69 Q 56,66 56,60 Z'" \
-            -draw "rectangle 70,69 74,75" \
-            -draw "path 'M 48,42 L 51,42 Q 54,48 51,54 L 48,54 Q 45,48 48,42 Z'" \
-            -draw "path 'M 93,42 L 96,42 Q 99,48 96,54 L 93,54 Q 90,48 93,42 Z'" \
-            -font DejaVu-Sans-Bold -pointsize 19 \
-            -gravity South -annotate +0+15 "ForkNews" \
+            -draw "rectangle 18,46 22,56" -draw "rectangle 24,46 28,56" -draw "rectangle 30,46 34,56" -draw "rectangle 36,46 40,56" \
+            -draw "rectangle 17,45 41,48" -draw "rectangle 24,56 34,72" \
+            -font DejaVu-Sans-Bold -pointsize 26 -gravity West -annotate +42-2 "ForkNews" \
+            -fill none -stroke white -strokewidth 3.5 -draw "path 'M 42,99 Q 60,95 78,99 Q 96,103 114,99'" \
+            -fill white -draw "path 'M 114,99 L 120,87 L 124,100 Z'" \
             app/src/main/res/mipmap-xxhdpi/ic_launcher.png
     
     cp app/src/main/res/mipmap-xxhdpi/ic_launcher.png app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
@@ -70,15 +60,11 @@ if command -v convert &> /dev/null; then
     # xxxhdpi (192x192)
     convert -size 192x192 xc:"#0049B8" \
             -fill white \
-            -draw "rectangle 93,40 99,48" \
-            -draw "path 'M 80,48 L 112,48 L 117,80 Q 117,88 109,92 L 83,92 Q 75,88 75,80 Z'" \
-            -draw "rectangle 93,92 99,100" \
-            -draw "path 'M 64,56 L 68,56 Q 72,64 68,72 L 64,72 Q 60,64 64,56 Z'" \
-            -draw "path 'M 124,56 L 128,56 Q 132,64 128,72 L 124,72 Q 120,64 124,56 Z'" \
-            -font DejaVu-Sans-Bold -pointsize 25 \
-            -gravity South -annotate +0+20 "ForkNews" \
-            -font DejaVu-Sans-Bold -pointsize 26 \
-            -gravity South -annotate +0+24 "ForkNews" \
+            -draw "rectangle 24,62 30,74" -draw "rectangle 32,62 38,74" -draw "rectangle 40,62 46,74" -draw "rectangle 48,62 54,74" \
+            -draw "rectangle 23,60 55,64" -draw "rectangle 32,74 46,96" \
+            -font DejaVu-Sans-Bold -pointsize 34 -gravity West -annotate +56-3 "ForkNews" \
+            -fill none -stroke white -strokewidth 4.5 -draw "path 'M 56,132 Q 80,127 104,132 Q 128,137 152,132'" \
+            -fill white -draw "path 'M 152,132 L 160,116 L 165,133 Z'" \
             app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
     
     cp app/src/main/res/mipmap-xxxhdpi/ic_launcher.png app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png

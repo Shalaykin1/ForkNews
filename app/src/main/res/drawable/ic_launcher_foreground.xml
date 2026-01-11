@@ -4,85 +4,83 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
     
-    <!-- Колокольчик уведомления -->
-    
-    <!-- Верхняя часть (кнопка) -->
+    <!-- Вилка (Fork) слева -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M52,22 L56,22 L56,26 L52,26 Z"/>
-    
-    <!-- Тело колокольчика -->
+        android:pathData="M14,35 L16,35 L16,42 L14,42 Z"/>
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M44,26 L64,26 L66,42 Q66,48 62,50 L46,50 Q42,48 42,42 Z"/>
-    
-    <!-- Вырез (для реалистичности) -->
-    <path
-        android:fillColor="#0049B8"
-        android:pathData="M48,44 L60,44 L61,48 L47,48 Z"/>
-    
-    <!-- Язычок колокольчика -->
+        android:pathData="M17,35 L19,35 L19,42 L17,42 Z"/>
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M52,50 L56,50 L56,54 Q56,56 54,56 Q52,56 52,54 Z"/>
-    
-    <!-- Звуковые волны (левая) -->
+        android:pathData="M20,35 L22,35 L22,42 L20,42 Z"/>
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M36,30 L38,30 Q40,34 38,38 L36,38 Q34,34 36,30 Z"/>
-    
+        android:pathData="M23,35 L25,35 L25,42 L23,42 Z"/>
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M30,28 L32,28 Q34,34 32,40 L30,40 Q28,34 30,28 Z"/>
-    
-    <!-- Звуковые волны (правая) -->
+        android:pathData="M13,34 L26,34 L26,36 L13,36 Z"/>
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M70,30 L72,30 Q74,34 72,38 L70,38 Q68,34 70,30 Z"/>
-    
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M76,28 L78,28 Q80,34 78,40 L76,40 Q74,34 76,28 Z"/>
+        android:pathData="M18,42 L21,42 L21,52 L18,52 Z"/>
     
     <!-- Текст "ForkNews" -->
     
     <!-- F -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M18,70 L18,84 L22,84 L22,78 L28,78 L28,75 L22,75 L22,73 L29,73 L29,70 Z"/>
+        android:pathData="M28,36 L28,52 L32,52 L32,45 L38,45 L38,42 L32,42 L32,39 L39,39 L39,36 Z"/>
     
     <!-- o -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M32,73 a5,5 0 1,1 0,10 a5,5 0 1,1 0,-10 M32,75 a3,3 0 1,0 0,6 a3,3 0 1,0 0,-6 Z"/>
+        android:pathData="M41,39 a6.5,6.5 0 1,1 0,13 a6.5,6.5 0 1,1 0,-13 M41,42 a3.5,3.5 0 1,0 0,7 a3.5,3.5 0 1,0 0,-7 Z"/>
     
     <!-- r -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M40,73 L40,83 L43,83 L43,76 L47,76 L47,73 Z"/>
+        android:pathData="M51,39 L51,52 L54,52 L54,43 L58,43 L58,39 Z"/>
     
     <!-- k -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M50,70 L50,83 L53,83 L53,78 L56,83 L60,83 L56,77 L60,73 L56,73 L53,77 L53,70 Z"/>
+        android:pathData="M60,36 L60,52 L63,52 L63,46 L67,52 L72,52 L67,44.5 L72,39 L67,39 L63,44 L63,36 Z"/>
     
     <!-- N -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M63,73 L63,83 L66,83 L66,78 L71,83 L74,83 L74,73 L71,73 L71,78 L66,73 Z"/>
+        android:pathData="M29,56 L29,72 L33,72 L33,64 L40,72 L44,72 L44,56 L40,56 L40,64 L33,56 Z"/>
     
     <!-- e -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M77,77 L86,77 L86,76 a4.5,4.5 0 1,0 -9,0 a4.5,4.5 0 1,0 9,0 M78,79 L78,80.5 a3,3 0 1,0 6,0 L84,79 Z"/>
+        android:pathData="M47,60 L59,60 L59,59 a6.5,6.5 0 1,0 -13,0 a6.5,6.5 0 1,0 13,0 M49,63 L49,66 a4.5,4.5 0 1,0 9,0 L58,63 Z"/>
     
     <!-- w -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M24,86 L24,96 L27,96 L29,91 L31,96 L34,96 L34,86 L31,86 L31,92 L29,86.5 L29,86.5 L27,92 L27,86 Z"/>
+        android:pathData="M62,56 L62,72 L66,72 L69,64 L72,72 L76,72 L76,56 L72,56 L72,66 L69,56 L69,56 L66,66 L66,56 Z"/>
     
     <!-- s -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M37,88 L43,88 L43,86 L37,86 a3,3 0 0,0 0,6 L43,92 a3,3 0 0,1 0,4 L37,96 L37,94 L43,94 Z"/>
+        android:pathData="M79,58 L88,58 L88,56 L79,56 a4,4 0 0,0 0,8 L88,64 a4,4 0 0,1 0,8 L79,72 L79,70 L88,70 Z"/>
+    
+    <!-- Волнистая линия под текстом -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:pathData="M28,75 Q35,73 42,75 Q49,77 56,75 Q63,73 70,75 Q77,77 84,75"/>
+    
+    <!-- Стрелка роста вверх -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M84,75 L88,68 L90,70 L86,78 L84,76 Z"/>
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:pathData="M86,76 L93,34"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M93,34 L96,40 L93,38 L90,40 Z"/>
 </vector>
