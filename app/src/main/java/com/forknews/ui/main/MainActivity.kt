@@ -43,6 +43,11 @@ class MainActivity : AppCompatActivity() {
     private var autoRefreshRunnable: Runnable? = null
     private var mainMenu: Menu? = null
     
+    // Easter egg: 10 taps on developer signature opens diagnostics
+    private var developerClickCount = 0
+    private val developerClickHandler = Handler(Looper.getMainLooper())
+    private var developerClickRunnable: Runnable? = null
+    
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -90,6 +95,9 @@ class MainActivity : AppCompatActivity() {
         
         // Запустить фоновую проверку обновлений через AlarmManager (точно каждые 5 минут)
         com.forknews.utils.AlarmScheduler.scheduleAlarm(this)
+        
+        // Easter egg: 10 taps on developer signature opens diagnostics
+        setupDeveloperEasterEgg()
     }
     
     override fun onResume() {
@@ -438,6 +446,32 @@ class MainActivity : AppCompatActivity() {
                     viewModel.addRepository(url)
                 }
                 DiagnosticLogger.log("MainActivity", "Добавлено ${defaultRepos.size} репозиториев по умолчанию")
+            }
+        }
+    }
+    
+    private fun setupDeveloperEasterEgg() {
+        binding.tvDeveloper.setOnClickListener {
+            developerClickCount++
+            DiagnosticLogger.log("MainActivity", "Easter egg клик: $developerClickCount/10")
+            
+            // Отменить предыдущий таймер сброса
+            developerClickRunnable?.let { developerClickHandler.removeCallbacks(it) }
+            
+            if (developerClickCount >= 10) {
+                // 10 нажатий - открыть диагностику
+                DiagnosticLogger.log("MainActivity", "Easter egg активирован! Открываем диагностику")
+                Toast.makeText(this, "Добро пожаловать в диагностику!", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, com.forknews.ui.diagnostic.DiagnosticActivity::class.java)
+                startActivity(intent)
+                developerClickCount = 0
+            } else {
+                // Сбросить счетчик через 3 секунды бездействия
+                developerClickRunnable = Runnable {
+                    DiagnosticLogger.log("MainActivity", "Easter egg сброшен после таймаута")
+                    developerClickCount = 0
+                }
+                developerClickHandler.postDelayed(developerClickRunnable!!, 3000)
             }
         }
     }
