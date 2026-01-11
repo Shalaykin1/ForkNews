@@ -71,7 +71,6 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginEnd="4dp"
-                            android:text="Обновить"
                             app:icon="@android:drawable/ic_menu_rotate"
                             style="@style/Widget.Material3.Button.TonalButton" />
 
@@ -81,7 +80,6 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginEnd="4dp"
-                            android:text="Копировать"
                             app:icon="@android:drawable/ic_menu_save"
                             style="@style/Widget.Material3.Button.TonalButton" />
 
@@ -91,7 +89,6 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginEnd="4dp"
-                            android:text="Поделиться"
                             app:icon="@android:drawable/ic_menu_share"
                             style="@style/Widget.Material3.Button.TonalButton" />
 
@@ -100,7 +97,6 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Очистить"
                             app:icon="@android:drawable/ic_menu_delete"
                             style="@style/Widget.Material3.Button.OutlinedButton" />
 
