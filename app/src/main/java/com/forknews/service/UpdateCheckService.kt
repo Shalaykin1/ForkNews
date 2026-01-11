@@ -56,6 +56,8 @@ class UpdateCheckService : Service() {
             } catch (e: Exception) {
                 com.forknews.utils.DiagnosticLogger.error("UpdateCheckService", "Ошибка проверки: ${e.message}", e)
             } finally {
+                // Убираем foreground уведомление сразу после проверки
+                stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
             }
         }
@@ -75,10 +77,12 @@ class UpdateCheckService : Service() {
         val channel = NotificationChannel(
             CHANNEL_ID,
             CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_LOW
+            NotificationManager.IMPORTANCE_MIN  // Минимальная важность - не показывать в панели
         ).apply {
             description = "Фоновая проверка обновлений"
             setShowBadge(false)
+            setSound(null, null)  // Без звука
+            enableVibration(false)  // Без вибрации
         }
         
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -98,10 +102,11 @@ class UpdateCheckService : Service() {
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("ForkNews")
             .setContentText("Проверка обновлений...")
-            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setPriority(NotificationCompat.PRIORITY_MIN)  // Минимальный приоритет
             .setContentIntent(pendingIntent)
-            .setOngoing(true)
+            .setOngoing(false)  // Можно смахнуть
             .setSilent(true)
+            .setShowWhen(false)  // Не показывать время
             .build()
     }
     
@@ -122,23 +127,46 @@ class UpdateCheckService : Service() {
         val repos = repository.getRepositoriesWithNotifications()
         com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Найдено репозиториев: ${repos.size}")
         
+        // Логируем каждый репозиторий
+        repos.forEachIndexed { index, repo ->
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "  [$index] ${repo.owner}/${repo.name} - последний релиз: ${repo.latestRelease ?: "нет данных"}, hasNewRelease: ${repo.hasNewRelease}")
+        }
+        
         var updatesFound = 0
         for (repo in repos) {
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "========================================")
             com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Проверяем: ${repo.owner}/${repo.name}")
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Текущий релиз: ${repo.latestRelease}")
+            
             val hasUpdate = repository.checkForUpdates(repo)
+            
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Результат проверки: hasUpdate=$hasUpdate")
             
             if (hasUpdate) {
                 updatesFound++
-                com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Найдено обновление для: ${repo.name}")
-                showUpdateNotification(
-                    repo.id.toInt(),
-                    repo.name,
-                    repo.latestRelease ?: "",
-                    repo.latestReleaseUrl ?: ""
-                )
+                // Перечитываем репозиторий, чтобы получить обновлённые данные
+                val updatedRepo = repository.getRepositoryById(repo.id)
+                if (updatedRepo != null) {
+                    com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "✓ НАЙДЕНО ОБНОВЛЕНИЕ!")
+                    com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "  Старый релиз: ${repo.latestRelease}")
+                    com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "  Новый релиз: ${updatedRepo.latestRelease}")
+                    com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "  URL: ${updatedRepo.latestReleaseUrl}")
+                    
+                    showUpdateNotification(
+                        updatedRepo.id.toInt(),
+                        updatedRepo.name,
+                        updatedRepo.latestRelease ?: "",
+                        updatedRepo.latestReleaseUrl ?: ""
+                    )
+                } else {
+                    com.forknews.utils.DiagnosticLogger.error("UpdateCheckService", "⚠️ Не удалось перечитать репозиторий после обновления")
+                }
+            } else {
+                com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Обновлений нет")
             }
         }
         
+        com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "========================================")
         com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "=== ПРОВЕРКА ЗАВЕРШЕНА === (обновлений: $updatesFound)")
     }
     
