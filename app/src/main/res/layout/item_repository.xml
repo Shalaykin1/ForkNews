@@ -33,21 +33,9 @@
             android:layout_marginStart="8dp"
             android:textSize="12sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@+id/ivNewBadge"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Latest"
-            tools:visibility="visible" />
-
-        <ImageView
-            android:id="@+id/ivNewBadge"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginStart="8dp"
-            android:contentDescription="@string/new_release"
-            android:src="@android:drawable/presence_online"
-            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            tools:text="Latest"
             tools:visibility="visible" />
 
         <TextView
@@ -69,10 +57,22 @@
             android:layout_marginTop="2dp"
             android:textSize="12sp"
             android:textColor="?attr/textSecondary"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/ivNewBadge"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvLatestRelease"
             tools:text="10 января 2026, 15:30" />
+
+        <ImageView
+            android:id="@+id/ivNewBadge"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="8dp"
+            android:contentDescription="@string/new_release"
+            android:src="@android:drawable/presence_online"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
