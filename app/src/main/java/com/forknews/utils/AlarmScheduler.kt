@@ -10,7 +10,7 @@ import com.forknews.receiver.AlarmReceiver
 
 object AlarmScheduler {
     private const val REQUEST_CODE = 1001
-    private const val INTERVAL_MILLIS = 5 * 60 * 1000L // 5 минут
+    private const val INTERVAL_MILLIS = 3 * 60 * 1000L // 3 минуты
     
     fun scheduleAlarm(context: Context) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -39,7 +39,7 @@ object AlarmScheduler {
                             pendingIntent
                         )
                         alarmManager.setAlarmClock(alarmClockInfo, pendingIntent)
-                        DiagnosticLogger.log("AlarmScheduler", "✓ Запланирован высокоприоритетный alarm через 5 минут (setAlarmClock)")
+                        DiagnosticLogger.log("AlarmScheduler", "✓ Запланирован высокоприоритетный alarm через 3 минуты (setAlarmClock)")
                     } else {
                         // Fallback если нет разрешения - используем setAndAllowWhileIdle
                         alarmManager.setAndAllowWhileIdle(
@@ -47,7 +47,7 @@ object AlarmScheduler {
                             triggerTime,
                             pendingIntent
                         )
-                        DiagnosticLogger.log("AlarmScheduler", "⚠ Запланирован неточный alarm через ~5 минут (setAndAllowWhileIdle)")
+                        DiagnosticLogger.log("AlarmScheduler", "⚠ Запланирован неточный alarm через ~3 минуты (setAndAllowWhileIdle)")
                         DiagnosticLogger.log("AlarmScheduler", "Рекомендация: разрешите точные alarms в настройках приложения")
                     }
                 }
@@ -58,7 +58,7 @@ object AlarmScheduler {
                         pendingIntent
                     )
                     alarmManager.setAlarmClock(alarmClockInfo, pendingIntent)
-                    DiagnosticLogger.log("AlarmScheduler", "✓ Запланирован высокоприоритетный alarm через 5 минут")
+                    DiagnosticLogger.log("AlarmScheduler", "✓ Запланирован высокоприоритетный alarm через 3 минуты")
                 }
             }
             
