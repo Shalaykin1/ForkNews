@@ -41,6 +41,11 @@
             android:exported="false"
             android:parentActivityName=".ui.main.MainActivity" />
 
+        <activity
+            android:name=".ui.diagnostic.DiagnosticActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.main.MainActivity" />
+
         <receiver
             android:name=".receiver.BootReceiver"
             android:enabled="true"
