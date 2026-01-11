@@ -147,17 +147,8 @@ class MainActivity : AppCompatActivity() {
                 toggleNotificationSound()
                 true
             }
-            R.id.action_diagnostic -> {
-                openDiagnostic()
-                true
-            }
             else -> super.onOptionsItemSelected(item)
         }
-    }
-    
-    private fun openDiagnostic() {
-        val intent = Intent(this, com.forknews.ui.diagnostic.DiagnosticActivity::class.java)
-        startActivity(intent)
     }
     
     private fun toggleNotificationSound() {
