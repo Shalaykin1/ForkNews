@@ -138,30 +138,30 @@ class UpdateCheckService : Service() {
             com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "========================================")
             com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Проверяем: ${repo.owner}/${repo.name}")
             com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Текущий релиз: ${repo.latestRelease}")
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Флаг hasNewRelease: ${repo.hasNewRelease}")
             
+            // Проверяем обновления
             val hasUpdate = repository.checkForUpdates(repo)
             
-            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Результат проверки: hasUpdate=$hasUpdate")
+            // Перечитываем репозиторий для актуальных данных
+            val updatedRepo = repository.getRepositoryById(repo.id) ?: repo
             
-            if (hasUpdate) {
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Результат проверки API: hasUpdate=$hasUpdate")
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Флаг hasNewRelease после проверки: ${updatedRepo.hasNewRelease}")
+            
+            // Отправляем уведомление, если есть новый релиз (флаг hasNewRelease=true)
+            if (updatedRepo.hasNewRelease) {
                 updatesFound++
-                // Перечитываем репозиторий, чтобы получить обновлённые данные
-                val updatedRepo = repository.getRepositoryById(repo.id)
-                if (updatedRepo != null) {
-                    com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "✓ НАЙДЕНО ОБНОВЛЕНИЕ!")
-                    com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "  Старый релиз: ${repo.latestRelease}")
-                    com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "  Новый релиз: ${updatedRepo.latestRelease}")
-                    com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "  URL: ${updatedRepo.latestReleaseUrl}")
-                    
-                    showUpdateNotification(
-                        updatedRepo.id.toInt(),
-                        updatedRepo.name,
-                        updatedRepo.latestRelease ?: "",
-                        updatedRepo.latestReleaseUrl ?: ""
-                    )
-                } else {
-                    com.forknews.utils.DiagnosticLogger.error("UpdateCheckService", "⚠️ Не удалось перечитать репозиторий после обновления")
-                }
+                com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "✓ НАЙДЕНО ОБНОВЛЕНИЕ!")
+                com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "  Новый релиз: ${updatedRepo.latestRelease}")
+                com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "  URL: ${updatedRepo.latestReleaseUrl}")
+                
+                showUpdateNotification(
+                    updatedRepo.id.toInt(),
+                    updatedRepo.name,
+                    updatedRepo.latestRelease ?: "",
+                    updatedRepo.latestReleaseUrl ?: ""
+                )
             } else {
                 com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Обновлений нет")
             }
