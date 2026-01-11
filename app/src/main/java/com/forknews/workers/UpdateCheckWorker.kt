@@ -214,7 +214,9 @@ class UpdateCheckWorker(
         }
         
         // Create intent to open URL
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
         val pendingIntent = PendingIntent.getActivity(
             applicationContext,
             id,
@@ -223,7 +225,9 @@ class UpdateCheckWorker(
         )
         
         // Full screen intent для всплывающих уведомлений
-        val fullScreenIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        val fullScreenIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
         val fullScreenPendingIntent = PendingIntent.getActivity(
             applicationContext,
             id + 1000,
@@ -256,15 +260,38 @@ class UpdateCheckWorker(
             .setLights(android.graphics.Color.BLUE, 1000, 1000)
             .setDefaults(0)
             .setTimeoutAfter(30000)
+            .setGroup("forknews_releases")
+            .setGroupSummary(false)
         
         // Добавляем звук только если включен
         if (soundEnabled) {
             notificationBuilder.setSound(soundUri)
         }
         
+        // Специальные флаги для Xiaomi/OnePlus/iQOO
+        val manufacturer = Build.MANUFACTURER.lowercase()
+        if (manufacturer.contains("xiaomi") || 
+            manufacturer.contains("redmi") || 
+            manufacturer.contains("poco") ||
+            manufacturer.contains("oppo") || 
+            manufacturer.contains("realme") || 
+            manufacturer.contains("oneplus") ||
+            manufacturer.contains("vivo") || 
+            manufacturer.contains("iqoo")) {
+            
+            // Для китайских производителей используем максимальный приоритет
+            notificationBuilder.setPriority(NotificationCompat.PRIORITY_MAX)
+            notificationBuilder.setDefaults(NotificationCompat.DEFAULT_ALL)
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "Применены специальные настройки для $manufacturer")
+        }
+        
         val notification = notificationBuilder.build()
         
         // Добавляем флаги для всплывающих окон (FLAG_INSISTENT только если звук включен)
+        notification.flags = notification.flags or 
+            android.app.Notification.FLAG_AUTO_CANCEL or
+            android.app.Notification.FLAG_SHOW_LIGHTS
+            
         if (soundEnabled) {
             notification.flags = notification.flags or android.app.Notification.FLAG_INSISTENT
         }

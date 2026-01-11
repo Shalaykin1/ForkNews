@@ -82,6 +82,9 @@ class MainActivity : AppCompatActivity() {
         requestBatteryOptimizationExemption()
         requestFullScreenNotificationPermission()
         
+        // Показать инструкции для производителей с ограничениями
+        showManufacturerInstructions()
+        
         // Инициализировать репозитории по умолчанию
         initDefaultRepositoriesIfNeeded()
         
@@ -246,6 +249,33 @@ class MainActivity : AppCompatActivity() {
             } else {
                 DiagnosticLogger.log("MainActivity", "Разрешение USE_FULL_SCREEN_INTENT уже предоставлено")
             }
+        }
+    }
+    
+    private fun showManufacturerInstructions() {
+        // Проверяем, показывали ли инструкции ранее
+        val prefs = getSharedPreferences("forknews_prefs", Context.MODE_PRIVATE)
+        val instructionsShown = prefs.getBoolean("manufacturer_instructions_shown", false)
+        
+        if (!instructionsShown && com.forknews.utils.ManufacturerHelper.hasKnownRestrictions()) {
+            val manufacturerName = com.forknews.utils.ManufacturerHelper.getManufacturerName()
+            val instructions = com.forknews.utils.ManufacturerHelper.getManufacturerInstructions()
+            
+            DiagnosticLogger.log("MainActivity", "Показываем инструкции для $manufacturerName")
+            
+            MaterialAlertDialogBuilder(this)
+                .setTitle("⚠️ Важно для $manufacturerName")
+                .setMessage("Для надёжной работы уведомлений на вашем устройстве необходимо настроить дополнительные разрешения.\n\n$instructions")
+                .setPositiveButton("Открыть настройки") { _, _ ->
+                    com.forknews.utils.ManufacturerHelper.openAutoStartSettings(this)
+                    prefs.edit().putBoolean("manufacturer_instructions_shown", true).apply()
+                }
+                .setNegativeButton("Позже") { _, _ ->
+                    prefs.edit().putBoolean("manufacturer_instructions_shown", true).apply()
+                }
+                .setNeutralButton("Показать снова", null)
+                .setCancelable(false)
+                .show()
         }
     }
     
