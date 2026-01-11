@@ -40,6 +40,7 @@ class UpdateCheckService : Service() {
     
     override fun onCreate() {
         super.onCreate()
+        com.forknews.utils.DiagnosticLogger.init(applicationContext)
         com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "=== SERVICE СОЗДАН ===")
         
         createNotificationChannel()

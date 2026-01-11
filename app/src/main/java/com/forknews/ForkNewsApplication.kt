@@ -10,10 +10,13 @@ class ForkNewsApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         
+        // Initialize DiagnosticLogger first
+        com.forknews.utils.DiagnosticLogger.init(this)
+        
         // Initialize PreferencesManager
         PreferencesManager.init(this)
         
-        // Initialize AlarmManager for 5-minute checks
+        // Initialize AlarmManager for 3-minute checks
         initAlarmScheduler()
     }    
 

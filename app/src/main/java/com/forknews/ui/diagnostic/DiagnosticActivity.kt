@@ -18,6 +18,9 @@ class DiagnosticActivity : AppCompatActivity() {
         binding = ActivityDiagnosticBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
+        // Инициализируем DiagnosticLogger
+        DiagnosticLogger.init(applicationContext)
+        
         setupToolbar()
         loadLogs()
         setupButtons()
