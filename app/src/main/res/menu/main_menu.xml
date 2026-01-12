@@ -6,9 +6,4 @@
         android:icon="@android:drawable/ic_input_add"
         android:title="@string/add_repository"
         app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/action_sound"
-        android:icon="@android:drawable/ic_lock_silent_mode_off"
-        android:title="Звук"
-        app:showAsAction="ifRoom" />
 </menu>

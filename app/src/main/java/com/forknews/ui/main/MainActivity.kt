@@ -134,7 +134,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         mainMenu = menu
-        updateSoundIcon()
         return true
     }
     
@@ -144,33 +143,7 @@ class MainActivity : AppCompatActivity() {
                 showAddRepositoryDialog()
                 true
             }
-            R.id.action_sound -> {
-                toggleNotificationSound()
-                true
-            }
             else -> super.onOptionsItemSelected(item)
-        }
-    }
-    
-    private fun toggleNotificationSound() {
-        lifecycleScope.launch {
-            val currentSound = PreferencesManager.getNotificationSoundEnabled().first()
-            PreferencesManager.setNotificationSoundEnabled(!currentSound)
-            val status = if (!currentSound) "включен" else "отключен"
-            Toast.makeText(this@MainActivity, "Звук уведомлений $status", Toast.LENGTH_SHORT).show()
-            updateSoundIcon()
-        }
-    }
-    
-    private fun updateSoundIcon() {
-        lifecycleScope.launch {
-            val soundEnabled = PreferencesManager.getNotificationSoundEnabled().first()
-            val iconRes = if (soundEnabled) {
-                android.R.drawable.ic_lock_silent_mode_off
-            } else {
-                android.R.drawable.ic_lock_silent_mode
-            }
-            mainMenu?.findItem(R.id.action_sound)?.setIcon(iconRes)
         }
     }
     

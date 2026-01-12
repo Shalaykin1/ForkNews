@@ -237,11 +237,6 @@ class UpdateCheckWorker(
         
         val soundUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
         
-        // Проверяем настройку звука
-        val soundEnabled = runBlocking {
-            PreferencesManager.getNotificationSoundEnabled().first()
-        }
-        
         val notificationBuilder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("🔔 $repoName: новый релиз")
@@ -259,14 +254,10 @@ class UpdateCheckWorker(
             .setVibrate(longArrayOf(0, 500, 200, 500))
             .setLights(android.graphics.Color.BLUE, 1000, 1000)
             .setDefaults(0)
+            .setSound(soundUri)
             .setTimeoutAfter(30000)
             .setGroup("forknews_releases")
             .setGroupSummary(false)
-        
-        // Добавляем звук только если включен
-        if (soundEnabled) {
-            notificationBuilder.setSound(soundUri)
-        }
         
         // Специальные флаги для Xiaomi/OnePlus/iQOO
         val manufacturer = Build.MANUFACTURER.lowercase()
@@ -287,14 +278,10 @@ class UpdateCheckWorker(
         
         val notification = notificationBuilder.build()
         
-        // Добавляем флаги для всплывающих окон (FLAG_INSISTENT только если звук включен)
+        // Добавляем флаги для всплывающих окон
         notification.flags = notification.flags or 
             android.app.Notification.FLAG_AUTO_CANCEL or
             android.app.Notification.FLAG_SHOW_LIGHTS
-            
-        if (soundEnabled) {
-            notification.flags = notification.flags or android.app.Notification.FLAG_INSISTENT
-        }
         
         try {
             notificationManager.notify(id, notification)
