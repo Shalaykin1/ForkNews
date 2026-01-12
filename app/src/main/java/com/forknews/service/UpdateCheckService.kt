@@ -194,47 +194,36 @@ class UpdateCheckService : Service() {
             return
         }
         
-        // Удаляем старый канал если он существует
-        try {
-            notificationManager.deleteNotificationChannel("forknews_updates")
-            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Старый канал уведомлений удален")
-        } catch (e: Exception) {
-            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Канал не существовал или ошибка удаления")
-        }
-        
-        // Создаем новый канал с максимальными настройками
+        // Создаем или получаем канал уведомлений
         val soundUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
-        val updateChannel = NotificationChannel(
-            "forknews_updates",
-            "Обновления репозиториев",
-            NotificationManager.IMPORTANCE_HIGH
-        ).apply {
-            description = "Уведомления о новых релизах с максимальным приоритетом"
-            enableLights(true)
-            lightColor = android.graphics.Color.BLUE
-            enableVibration(true)
-            vibrationPattern = longArrayOf(0, 1000, 500, 1000)
-            setShowBadge(true)
-            lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
-            setBypassDnd(true)
-            importance = NotificationManager.IMPORTANCE_HIGH
+        
+        // Проверяем существующий канал
+        val existingChannel = notificationManager.getNotificationChannel("forknews_updates")
+        if (existingChannel == null) {
+            val audioAttributes = android.media.AudioAttributes.Builder()
+                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION)
+                .build()
             
-            // Звук с максимальным приоритетом
-            setSound(
-                soundUri,
-                android.media.AudioAttributes.Builder()
-                    .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION_EVENT)
-                    .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .setFlags(android.media.AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
-                    .build()
-            )
-            
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                setBlockable(false)
+            val updateChannel = NotificationChannel(
+                "forknews_updates",
+                "Обновления репозиториев",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Уведомления о новых релизах"
+                enableLights(true)
+                lightColor = android.graphics.Color.BLUE
+                enableVibration(true)
+                vibrationPattern = longArrayOf(0, 500, 250, 500)
+                setShowBadge(true)
+                lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
+                setSound(soundUri, audioAttributes)
             }
+            notificationManager.createNotificationChannel(updateChannel)
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Канал уведомлений создан")
+        } else {
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Канал уведомлений уже существует")
         }
-        notificationManager.createNotificationChannel(updateChannel)
-        com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Канал уведомлений создан с IMPORTANCE_HIGH")
         
         // Create intent
         val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url)).apply {
@@ -257,61 +246,29 @@ class UpdateCheckService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         
-        // Для Xiaomi используем категорию ALARM для максимального приоритета
-        val manufacturer = Build.MANUFACTURER.lowercase()
-        val isXiaomi = manufacturer.contains("xiaomi") || 
-            manufacturer.contains("redmi") || 
-            manufacturer.contains("poco")
-        
-        val isChinese = isXiaomi || 
-            manufacturer.contains("oppo") || 
-            manufacturer.contains("realme") || 
-            manufacturer.contains("oneplus") ||
-            manufacturer.contains("vivo") || 
-            manufacturer.contains("iqoo")
-        
-        com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Создание уведомления для $manufacturer (китайский: $isChinese, xiaomi: $isXiaomi)")
-        
         val notificationBuilder = NotificationCompat.Builder(this, "forknews_updates")
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("🔔 $repoName: новый релиз")
             .setContentText(releaseName)
             .setStyle(NotificationCompat.BigTextStyle().bigText("Доступна новая версия: $releaseName\n\nНажмите для просмотра на GitHub"))
-            .setPriority(NotificationCompat.PRIORITY_MAX)
-            .setCategory(NotificationCompat.CATEGORY_ALARM)  // ALARM для всех - максимальный приоритет
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentIntent(pendingIntent)
             .setFullScreenIntent(fullScreenPendingIntent, true)
             .setAutoCancel(true)
-            .setOnlyAlertOnce(false)  // Всегда проигрывать звук
+            .setOnlyAlertOnce(false)
             .setShowWhen(true)
             .setWhen(System.currentTimeMillis())
-            .setVibrate(longArrayOf(0, 1000, 500, 1000))
-            .setLights(android.graphics.Color.BLUE, 1000, 1000)
-            .setDefaults(NotificationCompat.DEFAULT_ALL)  // Всегда все эффекты
-            .setSound(soundUri, android.media.AudioManager.STREAM_ALARM)  // Используем поток ALARM
-            .setGroup("forknews_releases")
-            .setGroupSummary(false)
-        
-        // Для китайских производителей - дополнительные настройки
-        if (isChinese) {
-            if (isXiaomi) {
-                notificationBuilder.setOngoing(true)  // Держим уведомление для Xiaomi
-            }
-            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Применены усиленные настройки для китайского производителя")
-        }
+            .setSound(soundUri)
+            .setVibrate(longArrayOf(0, 500, 250, 500))
+            .setLights(android.graphics.Color.BLUE, 500, 500)
         
         val notification = notificationBuilder.build()
         
-        // Максимальные флаги
-        notification.flags = notification.flags or 
-            android.app.Notification.FLAG_AUTO_CANCEL or
-            android.app.Notification.FLAG_INSISTENT or
-            android.app.Notification.FLAG_NO_CLEAR
-        
         try {
             notificationManager.notify(id, notification)
-            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "✓ Уведомление отправлено: $repoName (категория: ALARM, звук: ВКЛЮЧЕН, heads-up: ВКЛЮЧЕН)")
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "✓ Уведомление отправлено: $repoName")
         } catch (e: Exception) {
             com.forknews.utils.DiagnosticLogger.error("UpdateCheckService", "✗ Ошибка отправки уведомления: ${e.message}", e)
         }
