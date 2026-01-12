@@ -86,6 +86,7 @@ class MainActivity : AppCompatActivity() {
         requestNotificationPermission()
         requestBatteryOptimizationExemption()
         requestFullScreenNotificationPermission()
+        requestOverlayPermission()
         
         // Показать инструкции для производителей с ограничениями
         showManufacturerInstructions()
@@ -257,6 +258,32 @@ class MainActivity : AppCompatActivity() {
             } else {
                 DiagnosticLogger.log("MainActivity", "Разрешение USE_FULL_SCREEN_INTENT уже предоставлено")
             }
+        }
+    }
+    
+    private fun requestOverlayPermission() {
+        if (!android.provider.Settings.canDrawOverlays(this)) {
+            DiagnosticLogger.log("MainActivity", "Запрос разрешения SYSTEM_ALERT_WINDOW (Display pop-up windows)")
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Всплывающие окна")
+                .setMessage("Для показа всплывающих уведомлений поверх других приложений требуется разрешение \"Display pop-up windows\".\n\nЭто обеспечит немедленное отображение уведомлений о новых релизах со звуком, даже когда телефон заблокирован.")
+                .setPositiveButton("Разрешить") { _, _ ->
+                    try {
+                        val intent = Intent(
+                            android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                            Uri.parse("package:$packageName")
+                        )
+                        startActivity(intent)
+                        DiagnosticLogger.log("MainActivity", "Открыт экран настроек overlay permission")
+                    } catch (e: Exception) {
+                        DiagnosticLogger.error("MainActivity", "Ошибка открытия настроек overlay: ${e.message}", e)
+                        Toast.makeText(this, "Не удалось открыть настройки", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .setNegativeButton("Позже", null)
+                .show()
+        } else {
+            DiagnosticLogger.log("MainActivity", "Разрешение SYSTEM_ALERT_WINDOW уже предоставлено")
         }
     }
     
