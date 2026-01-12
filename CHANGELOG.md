@@ -5,6 +5,11 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и этот проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [2.8.9] - 2025-01-12
+
+### Удалено
+- ❌ Удален репозиторий aenu1/aps3e из списка по умолчанию
+
 ## [2.8.8] - 2025-01-12
 
 ### Удалено
