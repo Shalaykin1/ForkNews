@@ -202,7 +202,8 @@ class UpdateCheckService : Service() {
         if (existingChannel == null) {
             val audioAttributes = android.media.AudioAttributes.Builder()
                 .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION)
+                .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                .setFlags(android.media.AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
                 .build()
             
             val updateChannel = NotificationChannel(
@@ -214,13 +215,18 @@ class UpdateCheckService : Service() {
                 enableLights(true)
                 lightColor = android.graphics.Color.BLUE
                 enableVibration(true)
-                vibrationPattern = longArrayOf(0, 500, 250, 500)
+                vibrationPattern = longArrayOf(0, 1000, 500, 1000)
                 setShowBadge(true)
                 lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
+                setBypassDnd(true)
                 setSound(soundUri, audioAttributes)
+                
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    setBlockable(false)
+                }
             }
             notificationManager.createNotificationChannel(updateChannel)
-            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Канал уведомлений создан")
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Канал уведомлений создан с максимальными настройками")
         } else {
             com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Канал уведомлений уже существует")
         }
@@ -251,8 +257,8 @@ class UpdateCheckService : Service() {
             .setContentTitle("🔔 $repoName: новый релиз")
             .setContentText(releaseName)
             .setStyle(NotificationCompat.BigTextStyle().bigText("Доступна новая версия: $releaseName\n\nНажмите для просмотра на GitHub"))
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setCategory(NotificationCompat.CATEGORY_CALL)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentIntent(pendingIntent)
             .setFullScreenIntent(fullScreenPendingIntent, true)
@@ -261,10 +267,16 @@ class UpdateCheckService : Service() {
             .setShowWhen(true)
             .setWhen(System.currentTimeMillis())
             .setSound(soundUri)
-            .setVibrate(longArrayOf(0, 500, 250, 500))
-            .setLights(android.graphics.Color.BLUE, 500, 500)
+            .setVibrate(longArrayOf(0, 1000, 500, 1000))
+            .setLights(android.graphics.Color.BLUE, 1000, 1000)
+            .setDefaults(0)
         
         val notification = notificationBuilder.build()
+        
+        // Добавляем флаги для принудительного показа
+        notification.flags = notification.flags or 
+            android.app.Notification.FLAG_AUTO_CANCEL or
+            android.app.Notification.FLAG_INSISTENT
         
         try {
             notificationManager.notify(id, notification)

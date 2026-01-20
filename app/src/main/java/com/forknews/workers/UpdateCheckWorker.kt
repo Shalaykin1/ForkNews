@@ -243,7 +243,7 @@ class UpdateCheckWorker(
             .setContentText(releaseName)
             .setStyle(NotificationCompat.BigTextStyle().bigText("Доступна новая версия: $releaseName\n\nНажмите для просмотра на GitHub"))
             .setPriority(NotificationCompat.PRIORITY_MAX)
-            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+            .setCategory(NotificationCompat.CATEGORY_CALL)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentIntent(pendingIntent)
             .setFullScreenIntent(fullScreenPendingIntent, true)
@@ -251,37 +251,17 @@ class UpdateCheckWorker(
             .setOnlyAlertOnce(false)
             .setShowWhen(true)
             .setWhen(System.currentTimeMillis())
-            .setVibrate(longArrayOf(0, 500, 200, 500))
+            .setVibrate(longArrayOf(0, 1000, 500, 1000))
             .setLights(android.graphics.Color.BLUE, 1000, 1000)
             .setDefaults(0)
             .setSound(soundUri)
-            .setTimeoutAfter(30000)
-            .setGroup("forknews_releases")
-            .setGroupSummary(false)
-        
-        // Специальные флаги для Xiaomi/OnePlus/iQOO
-        val manufacturer = Build.MANUFACTURER.lowercase()
-        if (manufacturer.contains("xiaomi") || 
-            manufacturer.contains("redmi") || 
-            manufacturer.contains("poco") ||
-            manufacturer.contains("oppo") || 
-            manufacturer.contains("realme") || 
-            manufacturer.contains("oneplus") ||
-            manufacturer.contains("vivo") || 
-            manufacturer.contains("iqoo")) {
-            
-            // Для китайских производителей используем максимальный приоритет
-            notificationBuilder.setPriority(NotificationCompat.PRIORITY_MAX)
-            notificationBuilder.setDefaults(NotificationCompat.DEFAULT_ALL)
-            com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "Применены специальные настройки для $manufacturer")
-        }
         
         val notification = notificationBuilder.build()
         
-        // Добавляем флаги для всплывающих окон
+        // Добавляем флаги для принудительного показа
         notification.flags = notification.flags or 
             android.app.Notification.FLAG_AUTO_CANCEL or
-            android.app.Notification.FLAG_SHOW_LIGHTS
+            android.app.Notification.FLAG_INSISTENT
         
         try {
             notificationManager.notify(id, notification)
