@@ -149,12 +149,15 @@ class UpdateCheckService : Service() {
             com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Результат проверки API: hasUpdate=$hasUpdate")
             com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Флаг hasNewRelease после проверки: ${updatedRepo.hasNewRelease}")
             
-            // Отправляем уведомление, если есть новый релиз (флаг hasNewRelease=true)
-            if (updatedRepo.hasNewRelease) {
+            // Отправляем уведомление ТОЛЬКО если обнаружен новый релиз В ЭТОЙ проверке
+            // hasUpdate = true - релиз изменился прямо сейчас (показываем уведомление один раз)
+            // hasNewRelease = true - пользователь еще не просмотрел релиз (показываем зеленый кружок)
+            if (hasUpdate) {
                 updatesFound++
                 com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "✓ НАЙДЕНО ОБНОВЛЕНИЕ!")
                 com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "  Новый релиз: ${updatedRepo.latestRelease}")
                 com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "  URL: ${updatedRepo.latestReleaseUrl}")
+                com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "  Показываем уведомление (первое обнаружение)")
                 
                 showUpdateNotification(
                     updatedRepo.id.toInt(),
@@ -163,7 +166,10 @@ class UpdateCheckService : Service() {
                     updatedRepo.latestReleaseUrl ?: ""
                 )
             } else {
-                com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Обновлений нет")
+                com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Обновлений нет (релиз не изменился)")
+                if (updatedRepo.hasNewRelease) {
+                    com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "  (но hasNewRelease=true - зеленый кружок остается)")
+                }
             }
         }
         
