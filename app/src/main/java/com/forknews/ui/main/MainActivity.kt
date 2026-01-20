@@ -94,6 +94,7 @@ class MainActivity : AppCompatActivity() {
         requestFullScreenNotificationPermission()
         requestOverlayPermission()
         requestDoNotDisturbPermission()
+        requestBackgroundWindowPermission()
         
         // Показать инструкции для производителей с ограничениями
         showManufacturerInstructions()
@@ -321,6 +322,29 @@ class MainActivity : AppCompatActivity() {
             } else {
                 DiagnosticLogger.log("MainActivity", "Разрешение ACCESS_NOTIFICATION_POLICY уже предоставлено")
             }
+        }
+    }
+    
+    private fun requestBackgroundWindowPermission() {
+        if (Build.VERSION.SDK_INT >= 36) { // Android 16+
+            DiagnosticLogger.log("MainActivity", "Запрос разрешения на открытие окон в фоне (HyperOS 3)")
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Фоновые окна")
+                .setMessage("Для показа всплывающих уведомлений на HyperOS 3 требуется разрешение 'Open new windows while running in the background'.\n\nЭто позволит уведомлениям появляться поверх других приложений со звуком.")
+                .setPositiveButton("Настроить") { _, _ ->
+                    try {
+                        // Открываем настройки специальных разрешений приложения
+                        val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.parse("package:$packageName")
+                        }
+                        startActivity(intent)
+                        Toast.makeText(this, "Найдите 'Open new windows while running in the background' и включите", Toast.LENGTH_LONG).show()
+                    } catch (e: Exception) {
+                        DiagnosticLogger.error("MainActivity", "Ошибка открытия настроек: ${e.message}", e)
+                    }
+                }
+                .setNegativeButton("Позже", null)
+                .show()
         }
     }
     
@@ -584,6 +608,24 @@ class MainActivity : AppCompatActivity() {
                     return@launch
                 }
                 
+                // Проверяем и увеличиваем громкость уведомлений
+                val audioManager = getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
+                val currentVolume = audioManager.getStreamVolume(android.media.AudioManager.STREAM_NOTIFICATION)
+                val maxVolume = audioManager.getStreamMaxVolume(android.media.AudioManager.STREAM_NOTIFICATION)
+                
+                DiagnosticLogger.log("MainActivity", "Громкость уведомлений: $currentVolume/$maxVolume")
+                
+                if (currentVolume == 0) {
+                    // Устанавливаем среднюю громкость если была 0
+                    audioManager.setStreamVolume(
+                        android.media.AudioManager.STREAM_NOTIFICATION,
+                        maxVolume / 2,
+                        0
+                    )
+                    DiagnosticLogger.log("MainActivity", "Громкость уведомлений увеличена до ${maxVolume / 2}")
+                    Toast.makeText(this@MainActivity, "Громкость уведомлений была 0, увеличена", Toast.LENGTH_SHORT).show()
+                }
+                
                 // Проверяем или создаем канал
                 val soundUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
                 val existingChannel = notificationManager.getNotificationChannel("forknews_updates")
@@ -666,6 +708,16 @@ class MainActivity : AppCompatActivity() {
                 val notification = notificationBuilder.build()
                 // FLAG_INSISTENT - зацикливает звук до нажатия (для теста)
                 notification.flags = notification.flags or android.app.Notification.FLAG_INSISTENT or android.app.Notification.FLAG_NO_CLEAR
+                
+                // Проверяем режим звука
+                val ringerMode = audioManager.ringerMode
+                DiagnosticLogger.log("MainActivity", "Режим звука: $ringerMode (0=Silent, 1=Vibrate, 2=Normal)")
+                
+                if (ringerMode == android.media.AudioManager.RINGER_MODE_SILENT) {
+                    Toast.makeText(this@MainActivity, "⚠️ Телефон в беззвучном режиме! Включите звук.", Toast.LENGTH_LONG).show()
+                } else if (ringerMode == android.media.AudioManager.RINGER_MODE_VIBRATE) {
+                    Toast.makeText(this@MainActivity, "⚠️ Телефон в режиме вибрации. Звука не будет.", Toast.LENGTH_LONG).show()
+                }
                 
                 notificationManager.notify(9999, notification)
                 DiagnosticLogger.log("MainActivity", "✓ Тестовое уведомление отправлено")
