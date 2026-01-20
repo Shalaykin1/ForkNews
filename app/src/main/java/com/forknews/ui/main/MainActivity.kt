@@ -83,10 +83,17 @@ class MainActivity : AppCompatActivity() {
         setupRecyclerView()
         setupSwipeRefresh()
         observeData()
+        
+        // Android 16+ - принудительно пересоздаем канал уведомлений при первом запуске
+        if (Build.VERSION.SDK_INT >= 36) {
+            recreateNotificationChannelForAndroid16()
+        }
+        
         requestNotificationPermission()
         requestBatteryOptimizationExemption()
         requestFullScreenNotificationPermission()
         requestOverlayPermission()
+        requestDoNotDisturbPermission()
         
         // Показать инструкции для производителей с ограничениями
         showManufacturerInstructions()
@@ -209,6 +216,61 @@ class MainActivity : AppCompatActivity() {
         }
     }
     
+    private fun recreateNotificationChannelForAndroid16() {
+        val prefs = getSharedPreferences("forknews_prefs", Context.MODE_PRIVATE)
+        val channelRecreated = prefs.getBoolean("channel_recreated_android16", false)
+        
+        if (!channelRecreated) {
+            DiagnosticLogger.log("MainActivity", "=== ПЕРЕСОЗДАНИЕ КАНАЛА ДЛЯ ANDROID 16 ===")
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+            
+            // Удаляем старый канал
+            try {
+                notificationManager.deleteNotificationChannel("forknews_updates")
+                DiagnosticLogger.log("MainActivity", "Старый канал удален")
+            } catch (e: Exception) {
+                DiagnosticLogger.error("MainActivity", "Ошибка удаления канала: ${e.message}", e)
+            }
+            
+            // Создаем новый канал с максимальными настройками
+            val soundUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
+            val audioAttributes = android.media.AudioAttributes.Builder()
+                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                .setFlags(android.media.AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
+                .build()
+            
+            val updateChannel = android.app.NotificationChannel(
+                "forknews_updates",
+                "Обновления репозиториев",
+                android.app.NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Уведомления о новых релизах"
+                enableLights(true)
+                lightColor = android.graphics.Color.BLUE
+                enableVibration(true)
+                vibrationPattern = longArrayOf(0, 1000, 500, 1000, 500, 1000)
+                setShowBadge(true)
+                lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
+                setBypassDnd(true)
+                setSound(soundUri, audioAttributes)
+                setBlockable(false)
+            }
+            
+            notificationManager.createNotificationChannel(updateChannel)
+            DiagnosticLogger.log("MainActivity", "Новый канал создан с IMPORTANCE_HIGH для Android 16")
+            
+            // Проверяем созданный канал
+            val createdChannel = notificationManager.getNotificationChannel("forknews_updates")
+            DiagnosticLogger.log("MainActivity", "Важность канала после создания: ${createdChannel?.importance}")
+            
+            // Сохраняем флаг
+            prefs.edit().putBoolean("channel_recreated_android16", true).apply()
+            
+            Toast.makeText(this, "Канал уведомлений пересоздан для Android 16", Toast.LENGTH_LONG).show()
+        }
+    }
+    
     private fun requestFullScreenNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 14+
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
@@ -234,6 +296,30 @@ class MainActivity : AppCompatActivity() {
                     .show()
             } else {
                 DiagnosticLogger.log("MainActivity", "Разрешение USE_FULL_SCREEN_INTENT уже предоставлено")
+            }
+        }
+    }
+    
+    private fun requestDoNotDisturbPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+            if (!notificationManager.isNotificationPolicyAccessGranted) {
+                DiagnosticLogger.log("MainActivity", "Запрос разрешения ACCESS_NOTIFICATION_POLICY для обхода DND")
+                MaterialAlertDialogBuilder(this)
+                    .setTitle("Обход режима Не беспокоить")
+                    .setMessage("Для надежной работы уведомлений на HyperOS 3 требуется разрешение на обход режима Не беспокоить.\n\nЭто гарантирует, что уведомления о новых релизах будут приходить даже в режиме Не беспокоить.")
+                    .setPositiveButton("Разрешить") { _, _ ->
+                        try {
+                            val intent = Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
+                            startActivity(intent)
+                        } catch (e: Exception) {
+                            DiagnosticLogger.error("MainActivity", "Ошибка открытия настроек DND: ${e.message}", e)
+                        }
+                    }
+                    .setNegativeButton("Позже", null)
+                    .show()
+            } else {
+                DiagnosticLogger.log("MainActivity", "Разрешение ACCESS_NOTIFICATION_POLICY уже предоставлено")
             }
         }
     }
