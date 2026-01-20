@@ -574,11 +574,12 @@ class MainActivity : AppCompatActivity() {
                 
                 // Android 16+ дополнительные настройки для надежного показа
                 if (Build.VERSION.SDK_INT >= 36) { // Android 16+
-                    DiagnosticLogger.log("MainActivity", "Применены настройки для Android 16+")
+                    DiagnosticLogger.log("MainActivity", "Применены настройки для Android 16+ (HyperOS 3)")
                 }
                 
                 val notification = notificationBuilder.build()
-                notification.flags = notification.flags or android.app.Notification.FLAG_INSISTENT
+                // FLAG_INSISTENT - зацикливает звук до нажатия (для теста)
+                notification.flags = notification.flags or android.app.Notification.FLAG_INSISTENT or android.app.Notification.FLAG_NO_CLEAR
                 
                 notificationManager.notify(9999, notification)
                 DiagnosticLogger.log("MainActivity", "✓ Тестовое уведомление отправлено")

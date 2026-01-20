@@ -270,7 +270,7 @@ class UpdateCheckService : Service() {
             .setContentText(releaseName)
             .setStyle(NotificationCompat.BigTextStyle().bigText("Доступна новая версия: $releaseName\n\nНажмите для просмотра на GitHub"))
             .setPriority(NotificationCompat.PRIORITY_MAX)
-            .setCategory(NotificationCompat.CATEGORY_CALL)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)  // ALARM для максимального приоритета на Xiaomi/HyperOS
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentIntent(pendingIntent)
             .setFullScreenIntent(fullScreenPendingIntent, true)
@@ -279,7 +279,7 @@ class UpdateCheckService : Service() {
             .setShowWhen(true)
             .setWhen(System.currentTimeMillis())
             .setSound(soundUri)
-            .setVibrate(longArrayOf(0, 1000, 500, 1000))
+            .setVibrate(longArrayOf(0, 1000, 500, 1000, 500, 1000))  // Увеличенная вибрация для лучшей заметности
             .setLights(android.graphics.Color.BLUE, 1000, 1000)
             .setDefaults(0)
         
