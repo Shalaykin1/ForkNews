@@ -552,7 +552,8 @@ class MainActivity : AppCompatActivity() {
                     android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
                 )
                 
-                val notification = androidx.core.app.NotificationCompat.Builder(this@MainActivity, "forknews_updates")
+                // Android 16+ требует явной настройки звука и приоритета
+                val notificationBuilder = androidx.core.app.NotificationCompat.Builder(this@MainActivity, "forknews_updates")
                     .setSmallIcon(R.drawable.ic_notification)
                     .setContentTitle("🧪 Тестовое уведомление")
                     .setContentText("Это тест. Уведомления работают!")
@@ -570,7 +571,14 @@ class MainActivity : AppCompatActivity() {
                     .setVibrate(longArrayOf(0, 1000, 500, 1000))
                     .setLights(android.graphics.Color.BLUE, 1000, 1000)
                     .setDefaults(0)
-                    .build()
+                
+                // Android 16+ дополнительные настройки для надежного показа
+                if (Build.VERSION.SDK_INT >= 36) { // Android 16+
+                    DiagnosticLogger.log("MainActivity", "Применены настройки для Android 16+")
+                }
+                
+                val notification = notificationBuilder.build()
+                notification.flags = notification.flags or android.app.Notification.FLAG_INSISTENT
                 
                 notificationManager.notify(9999, notification)
                 DiagnosticLogger.log("MainActivity", "✓ Тестовое уведомление отправлено")

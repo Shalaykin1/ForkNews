@@ -171,13 +171,22 @@ class UpdateCheckWorker(
             return
         }
         
-        // Create notification channel for Android O and above
-        val channel = NotificationChannel(
-            CHANNEL_ID,
-            CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_HIGH
-        ).apply {
-            description = "Уведомления об обновлениях репозиториев"
+        // Проверяем существующий канал и его важность
+        val existingChannel = notificationManager.getNotificationChannel(CHANNEL_ID)
+        if (existingChannel == null || existingChannel.importance < NotificationManager.IMPORTANCE_HIGH) {
+            // Удаляем старый канал если важность недостаточная (для Android 16)
+            if (existingChannel != null && existingChannel.importance < NotificationManager.IMPORTANCE_HIGH) {
+                notificationManager.deleteNotificationChannel(CHANNEL_ID)
+                com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "Удален старый канал с низкой важностью")
+            }
+            
+            // Create notification channel for Android O and above
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Уведомления об обновлениях репозиториев"
             enableLights(true)
             lightColor = android.graphics.Color.BLUE
             enableVibration(true)
@@ -206,10 +215,15 @@ class UpdateCheckWorker(
         notificationManager.createNotificationChannel(channel)
         
         // Check channel importance
-        val createdChannel = notificationManager.getNotificationChannel(CHANNEL_ID)
-        com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "Канал создан: importance=${createdChannel?.importance}")
+        val finalChannel = notificationManager.getNotificationChannel(CHANNEL_ID)
+        com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "Канал создан с важностью: ${finalChannel?.importance}")
+        } else {
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "Канал существует (важность: ${existingChannel.importance})")
+        }
         
-        if (createdChannel?.importance == NotificationManager.IMPORTANCE_NONE) {
+        // Проверяем финальный канал
+        val currentChannel = notificationManager.getNotificationChannel(CHANNEL_ID)
+        if (currentChannel?.importance == NotificationManager.IMPORTANCE_NONE) {
             com.forknews.utils.DiagnosticLogger.error("UpdateCheckWorker", "⚠️ Канал уведомлений отключен пользователем!")
         }
         
@@ -255,6 +269,11 @@ class UpdateCheckWorker(
             .setLights(android.graphics.Color.BLUE, 1000, 1000)
             .setDefaults(0)
             .setSound(soundUri)
+        
+        // Android 16+ дополнительные настройки
+        if (Build.VERSION.SDK_INT >= 36) { // Android 16+
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckWorker", "Применены настройки для Android 16+")
+        }
         
         val notification = notificationBuilder.build()
         

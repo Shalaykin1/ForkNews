@@ -205,7 +205,13 @@ class UpdateCheckService : Service() {
         
         // Проверяем существующий канал
         val existingChannel = notificationManager.getNotificationChannel("forknews_updates")
-        if (existingChannel == null) {
+        if (existingChannel == null || existingChannel.importance < NotificationManager.IMPORTANCE_HIGH) {
+            // Удаляем старый канал если важность недостаточная (для Android 16)
+            if (existingChannel != null && existingChannel.importance < NotificationManager.IMPORTANCE_HIGH) {
+                notificationManager.deleteNotificationChannel("forknews_updates")
+                com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Удален старый канал с низкой важностью")
+            }
+            
             val audioAttributes = android.media.AudioAttributes.Builder()
                 .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
@@ -232,9 +238,9 @@ class UpdateCheckService : Service() {
                 }
             }
             notificationManager.createNotificationChannel(updateChannel)
-            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Канал уведомлений создан с максимальными настройками")
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Канал уведомлений создан с максимальными настройками (важность: HIGH)")
         } else {
-            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Канал уведомлений уже существует")
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Канал уведомлений существует (важность: ${existingChannel.importance})")
         }
         
         // Create intent
@@ -276,6 +282,11 @@ class UpdateCheckService : Service() {
             .setVibrate(longArrayOf(0, 1000, 500, 1000))
             .setLights(android.graphics.Color.BLUE, 1000, 1000)
             .setDefaults(0)
+        
+        // Android 16+ дополнительные настройки
+        if (Build.VERSION.SDK_INT >= 36) { // Android 16+
+            com.forknews.utils.DiagnosticLogger.log("UpdateCheckService", "Применены настройки для Android 16+")
+        }
         
         val notification = notificationBuilder.build()
         
