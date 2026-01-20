@@ -255,7 +255,6 @@ class UpdateCheckWorker(
             .setLights(android.graphics.Color.BLUE, 1000, 1000)
             .setDefaults(0)
             .setSound(soundUri)
-            .setTimeoutAfter(5000)
         
         val notification = notificationBuilder.build()
         

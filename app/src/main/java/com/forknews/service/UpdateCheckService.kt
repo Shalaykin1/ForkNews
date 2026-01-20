@@ -270,7 +270,6 @@ class UpdateCheckService : Service() {
             .setVibrate(longArrayOf(0, 1000, 500, 1000))
             .setLights(android.graphics.Color.BLUE, 1000, 1000)
             .setDefaults(0)
-            .setTimeoutAfter(5000)
         
         val notification = notificationBuilder.build()
         

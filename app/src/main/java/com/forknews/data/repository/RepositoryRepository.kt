@@ -135,8 +135,8 @@ class RepositoryRepository(
                     }
                     return hasNewUpdate
                 } else {
-                    // Релиз не изменился - обновляем только время
-                    repositoryDao.updateReleaseWithoutNotification(
+                    // Релиз не изменился - обновляем только время, не трогая hasNewRelease
+                    repositoryDao.updateLastChecked(
                         repository.id,
                         newRelease,
                         release.html_url,
