@@ -93,8 +93,36 @@ class RepositoryAdapter(
                 val date = inputFormat.parse(dateString)
                 
                 if (date != null) {
-                    val outputFormat = SimpleDateFormat("d MMMM yyyy, HH:mm", Locale("ru"))
-                    "Опубликовано: ${outputFormat.format(date)}"
+                    val now = System.currentTimeMillis()
+                    val diff = now - date.time
+                    
+                    val seconds = diff / 1000
+                    val minutes = seconds / 60
+                    val hours = minutes / 60
+                    val days = hours / 24
+                    val weeks = days / 7
+                    val months = days / 30
+                    val years = days / 365
+                    
+                    val relativeTime = when {
+                        seconds < 60 -> "только что"
+                        minutes < 2 -> "минуту назад"
+                        minutes < 5 -> "$minutes минуты назад"
+                        minutes < 60 -> "$minutes минут назад"
+                        hours < 2 -> "час назад"
+                        hours < 5 -> "$hours часа назад"
+                        hours < 24 -> "$hours часов назад"
+                        days < 2 -> "вчера"
+                        days < 7 -> "$days дня назад"
+                        weeks < 2 -> "на прошлой неделе"
+                        weeks < 4 -> "$weeks недели назад"
+                        months < 2 -> "в прошлом месяце"
+                        months < 12 -> "$months месяца назад"
+                        years < 2 -> "год назад"
+                        else -> "$years лет назад"
+                    }
+                    
+                    relativeTime
                 } else {
                     ""
                 }
