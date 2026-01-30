@@ -89,12 +89,18 @@ class MainActivity : AppCompatActivity() {
             recreateNotificationChannelForAndroid16()
         }
         
-        requestNotificationPermission()
-        requestBatteryOptimizationExemption()
-        requestFullScreenNotificationPermission()
-        requestOverlayPermission()
-        requestDoNotDisturbPermission()
-        requestBackgroundWindowPermission()
+        // Запрашиваем все необходимые разрешения при первом запуске
+        val isFirstLaunch = PreferencesManager.isFirstLaunch()
+        if (isFirstLaunch) {
+            PreferencesManager.setFirstLaunchDone()
+            // Последовательно запрашиваем все разрешения
+            requestNotificationPermission()
+            requestBatteryOptimizationExemption()
+            requestFullScreenNotificationPermission()
+            requestOverlayPermission()
+            requestDoNotDisturbPermission()
+            requestBackgroundWindowPermission()
+        }
         
         // Показать инструкции для производителей с ограничениями
         showManufacturerInstructions()
@@ -706,8 +712,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 
                 val notification = notificationBuilder.build()
-                // FLAG_INSISTENT - зацикливает звук до нажатия (для теста)
-                notification.flags = notification.flags or android.app.Notification.FLAG_INSISTENT or android.app.Notification.FLAG_NO_CLEAR
+                // Звук будет одноразовым (без FLAG_INSISTENT)
                 
                 // Проверяем режим звука
                 val ringerMode = audioManager.ringerMode

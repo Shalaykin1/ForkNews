@@ -17,9 +17,27 @@ object PreferencesManager {
     
     private val NOTIFICATION_SOUND_ENABLED_KEY = booleanPreferencesKey("notification_sound_enabled")
     private val GITHUB_TOKEN_KEY = stringPreferencesKey("github_token")
+    private val FIRST_LAUNCH_KEY = booleanPreferencesKey("first_launch")
     
     fun init(context: Context) {
         this.context = context.applicationContext
+    }
+    
+    // First launch tracking
+    fun isFirstLaunch(): Boolean {
+        return runBlocking {
+            context.dataStore.data.map { preferences ->
+                preferences[FIRST_LAUNCH_KEY] ?: true // По умолчанию true (первый запуск)
+            }.first()
+        }
+    }
+    
+    fun setFirstLaunchDone() {
+        runBlocking {
+            context.dataStore.edit { preferences ->
+                preferences[FIRST_LAUNCH_KEY] = false
+            }
+        }
     }
     
     // Notification sound
