@@ -6,8 +6,4 @@
         android:icon="@android:drawable/ic_input_add"
         android:title="@string/add_repository"
         app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/action_test_notification"
-        android:title="Тест уведомления"
-        app:showAsAction="never" />
 </menu>
