@@ -12,8 +12,8 @@ android {
         applicationId = "com.forknews"
         minSdk = 33  // Android 13
         targetSdk = 34
-        versionCode = 87
-        versionName = "2.10.7"
+        versionCode = 88
+        versionName = "2.10.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
