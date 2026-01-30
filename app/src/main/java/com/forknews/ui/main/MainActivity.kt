@@ -98,8 +98,6 @@ class MainActivity : AppCompatActivity() {
             requestBatteryOptimizationExemption()
             requestFullScreenNotificationPermission()
             requestOverlayPermission()
-            requestDoNotDisturbPermission()
-            requestBackgroundWindowPermission()
         }
         
         // Показать инструкции для производителей с ограничениями
@@ -259,7 +257,6 @@ class MainActivity : AppCompatActivity() {
                 vibrationPattern = longArrayOf(0, 1000, 500, 1000, 500, 1000)
                 setShowBadge(true)
                 lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
-                setBypassDnd(true)
                 setSound(soundUri, audioAttributes)
                 setBlockable(false)
             }
@@ -307,52 +304,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
     
-    private fun requestDoNotDisturbPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-            if (!notificationManager.isNotificationPolicyAccessGranted) {
-                DiagnosticLogger.log("MainActivity", "Запрос разрешения ACCESS_NOTIFICATION_POLICY для обхода DND")
-                MaterialAlertDialogBuilder(this)
-                    .setTitle("Обход режима Не беспокоить")
-                    .setMessage("Для надежной работы уведомлений на HyperOS 3 требуется разрешение на обход режима Не беспокоить.\n\nЭто гарантирует, что уведомления о новых релизах будут приходить даже в режиме Не беспокоить.")
-                    .setPositiveButton("Разрешить") { _, _ ->
-                        try {
-                            val intent = Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
-                            startActivity(intent)
-                        } catch (e: Exception) {
-                            DiagnosticLogger.error("MainActivity", "Ошибка открытия настроек DND: ${e.message}", e)
-                        }
-                    }
-                    .setNegativeButton("Позже", null)
-                    .show()
-            } else {
-                DiagnosticLogger.log("MainActivity", "Разрешение ACCESS_NOTIFICATION_POLICY уже предоставлено")
-            }
-        }
-    }
-    
-    private fun requestBackgroundWindowPermission() {
-        if (Build.VERSION.SDK_INT >= 36) { // Android 16+
-            DiagnosticLogger.log("MainActivity", "Запрос разрешения на открытие окон в фоне (HyperOS 3)")
-            MaterialAlertDialogBuilder(this)
-                .setTitle("Фоновые окна")
-                .setMessage("Для показа всплывающих уведомлений на HyperOS 3 требуется разрешение 'Open new windows while running in the background'.\n\nЭто позволит уведомлениям появляться поверх других приложений со звуком.")
-                .setPositiveButton("Настроить") { _, _ ->
-                    try {
-                        // Открываем настройки специальных разрешений приложения
-                        val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = Uri.parse("package:$packageName")
-                        }
-                        startActivity(intent)
-                        Toast.makeText(this, "Найдите 'Open new windows while running in the background' и включите", Toast.LENGTH_LONG).show()
-                    } catch (e: Exception) {
-                        DiagnosticLogger.error("MainActivity", "Ошибка открытия настроек: ${e.message}", e)
-                    }
-                }
-                .setNegativeButton("Позже", null)
-                .show()
-        }
-    }
+
     
     private fun requestOverlayPermission() {
         if (!android.provider.Settings.canDrawOverlays(this)) {
@@ -654,7 +606,6 @@ class MainActivity : AppCompatActivity() {
                         vibrationPattern = longArrayOf(0, 1000, 500, 1000)
                         setShowBadge(true)
                         lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
-                        setBypassDnd(true)
                         setSound(soundUri, audioAttributes)
                         
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

@@ -194,9 +194,6 @@ class UpdateCheckWorker(
             setShowBadge(true)
             lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
             
-            // Обходить режим "Не беспокоить"
-            setBypassDnd(true)
-            
             val soundUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
             setSound(
                 soundUri,

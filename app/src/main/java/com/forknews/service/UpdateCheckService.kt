@@ -230,7 +230,6 @@ class UpdateCheckService : Service() {
                 vibrationPattern = longArrayOf(0, 1000, 500, 1000)
                 setShowBadge(true)
                 lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
-                setBypassDnd(true)
                 setSound(soundUri, audioAttributes)
                 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
