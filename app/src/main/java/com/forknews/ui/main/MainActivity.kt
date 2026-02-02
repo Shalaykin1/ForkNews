@@ -498,9 +498,7 @@ class MainActivity : AppCompatActivity() {
                     "https://github.com/StevenMXZ/Winlator-Ludashi/",
                     "https://github.com/brunodev85/winlator/",
                     "https://github.com/K11MCH1/AdrenoToolsDrivers/",
-                    "https://github.com/StevenMXZ/freedreno_turnip-CI/",
-                    "https://github.com/aenu1/aps3e/",
-                    "https://github.com/Shalaykin1/ForkNews/"
+                    "https://github.com/StevenMXZ/freedreno_turnip-CI/"
                 )
                 defaultRepos.forEach { url ->
                     viewModel.addRepository(url)
