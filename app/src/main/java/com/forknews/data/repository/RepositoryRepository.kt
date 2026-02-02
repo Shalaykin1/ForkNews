@@ -101,41 +101,49 @@ class RepositoryRepository(
             
             // Если релиз получен - сохраняем
             if (release != null) {
-                com.forknews.utils.DiagnosticLogger.log("RepositoryRepository", "Релиз получен, сохраняем: ${release.tag_name}")
+                com.forknews.utils.DiagnosticLogger.log("RepositoryRepository", "Релиз получен: ${release.tag_name}")
                 val newRelease = release.tag_name
                 val releaseName = release.name?.takeIf { it.isNotBlank() }
                 val isPrerelease = release.prerelease
                 
-                // Если это первая проверка или релиз изменился
-                if (repository.latestRelease == null || newRelease != repository.latestRelease) {
-                    val hasNewUpdate = repository.latestRelease != null && newRelease != repository.latestRelease
-                    
-                    if (hasNewUpdate) {
-                        // Есть обновление - помечаем как новое
-                        repositoryDao.updateRelease(
-                            repository.id,
-                            newRelease,
-                            release.html_url,
-                            releaseName,
-                            System.currentTimeMillis(),
-                            isPrerelease,
-                            release.published_at
-                        )
-                    } else {
-                        // Первая проверка - сохраняем без уведомления
-                        repositoryDao.updateReleaseWithoutNotification(
-                            repository.id,
-                            newRelease,
-                            release.html_url,
-                            releaseName,
-                            System.currentTimeMillis(),
-                            isPrerelease,
-                            release.published_at
-                        )
-                    }
-                    return hasNewUpdate
+                // Получаем текущее состояние из БД для надежности
+                val currentRepo = repositoryDao.getRepositoryById(repository.id)
+                val oldRelease = currentRepo?.latestRelease
+                
+                com.forknews.utils.DiagnosticLogger.log("RepositoryRepository", "Сравнение: старый='$oldRelease', новый='$newRelease'")
+                
+                // Релиз изменился?
+                val hasNewUpdate = oldRelease != null && oldRelease != newRelease
+                
+                if (oldRelease == null) {
+                    // Первая проверка - сохраняем без уведомления
+                    com.forknews.utils.DiagnosticLogger.log("RepositoryRepository", "Первая проверка, сохраняем без уведомления")
+                    repositoryDao.updateReleaseWithoutNotification(
+                        repository.id,
+                        newRelease,
+                        release.html_url,
+                        releaseName,
+                        System.currentTimeMillis(),
+                        isPrerelease,
+                        release.published_at
+                    )
+                    return false
+                } else if (hasNewUpdate) {
+                    // Релиз изменился - отправляем уведомление
+                    com.forknews.utils.DiagnosticLogger.log("RepositoryRepository", "Релиз изменился! Старый: $oldRelease -> Новый: $newRelease")
+                    repositoryDao.updateRelease(
+                        repository.id,
+                        newRelease,
+                        release.html_url,
+                        releaseName,
+                        System.currentTimeMillis(),
+                        isPrerelease,
+                        release.published_at
+                    )
+                    return true
                 } else {
-                    // Релиз не изменился - обновляем только время, не трогая hasNewRelease
+                    // Релиз не изменился - только обновляем время
+                    com.forknews.utils.DiagnosticLogger.log("RepositoryRepository", "Релиз не изменился, обновляем время проверки")
                     repositoryDao.updateLastChecked(
                         repository.id,
                         newRelease,
