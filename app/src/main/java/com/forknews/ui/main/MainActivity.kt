@@ -155,6 +155,10 @@ class MainActivity : AppCompatActivity() {
                 showAddRepositoryDialog()
                 true
             }
+            R.id.action_check_permissions -> {
+                checkAllPermissions()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -214,6 +218,73 @@ class MainActivity : AppCompatActivity() {
                     requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                 }
             }
+        }
+    }
+    
+    private fun checkAllPermissions() {
+        val missingPermissions = mutableListOf<String>()
+        
+        // Проверка POST_NOTIFICATIONS (Android 13+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) 
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                missingPermissions.add("• Разрешение на показ уведомлений")
+            }
+        }
+        
+        // Проверка SCHEDULE_EXACT_ALARM (Android 12+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+                missingPermissions.add("• Разрешение на точные уведомления по времени")
+            }
+        }
+        
+        // Проверка USE_FULL_SCREEN_INTENT (Android 10+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (!android.provider.Settings.canDrawOverlays(this)) {
+                missingPermissions.add("• Разрешение на полноэкранные уведомления")
+            }
+        }
+        
+        // Проверка оптимизации батареи (Android 6+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val powerManager = getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+            if (!powerManager.isIgnoringBatteryOptimizations(packageName)) {
+                missingPermissions.add("• Отключение оптимизации батареи (рекомендуется)")
+            }
+        }
+        
+        // Показываем результат
+        if (missingPermissions.isEmpty()) {
+            MaterialAlertDialogBuilder(this)
+                .setTitle("✓ Все разрешения предоставлены")
+                .setMessage("ForkNews имеет все необходимые разрешения для корректной работы уведомлений.")
+                .setPositiveButton("OK", null)
+                .show()
+        } else {
+            val message = "Отсутствуют следующие разрешения:\n\n" + 
+                         missingPermissions.joinToString("\n") +
+                         "\n\nНажмите \"Настроить\", чтобы перейти в настройки приложения и предоставить необходимые разрешения."
+            
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Требуются разрешения")
+                .setMessage(message)
+                .setPositiveButton("Настроить") { _, _ ->
+                    try {
+                        val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.parse("package:$packageName")
+                        }
+                        startActivity(intent)
+                        DiagnosticLogger.log("MainActivity", "Открыты настройки приложения для проверки разрешений")
+                    } catch (e: Exception) {
+                        DiagnosticLogger.error("MainActivity", "Ошибка открытия настроек: ${e.message}", e)
+                        Toast.makeText(this, "Не удалось открыть настройки", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .setNegativeButton("Позже", null)
+                .show()
         }
     }
     

@@ -6,4 +6,9 @@
         android:icon="@android:drawable/ic_input_add"
         android:title="@string/add_repository"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_check_permissions"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:title="@string/check_permissions"
+        app:showAsAction="never" />
 </menu>

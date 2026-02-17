@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">ForkNews</string>
     <string name="add_repository">Добавить репозиторий</string>
+    <string name="check_permissions">Проверить разрешения</string>
     <string name="new_release">Новый релиз</string>
     <string name="notifications">Уведомления</string>
     <string name="check_interval">Частота проверки</string>

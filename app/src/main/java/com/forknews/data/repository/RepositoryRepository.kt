@@ -72,8 +72,10 @@ class RepositoryRepository(
                     com.forknews.utils.DiagnosticLogger.error("RepositoryRepository", "getAllReleases ошибка HTTP ${allReleasesResponse.code()}: ${allReleasesResponse.errorBody()?.string()}")
                 }
                 if (allReleasesResponse.isSuccessful && !allReleasesResponse.body().isNullOrEmpty()) {
-                    release = allReleasesResponse.body()!!.first()
-                    com.forknews.utils.DiagnosticLogger.log("RepositoryRepository", "Получен релиз из getAllReleases: ${release.tag_name}")
+                    // Сортируем релизы по дате публикации (самый новый - первый)
+                    val sortedReleases = allReleasesResponse.body()!!.sortedByDescending { it.published_at }
+                    release = sortedReleases.first()
+                    com.forknews.utils.DiagnosticLogger.log("RepositoryRepository", "Получен релиз из getAllReleases (отсортирован по дате): ${release.tag_name}, дата: ${release.published_at}")
                 }
             } catch (e: Exception) {
                 com.forknews.utils.DiagnosticLogger.error("RepositoryRepository", "Ошибка getAllReleases: ${e.message}", e)
@@ -156,9 +158,12 @@ class RepositoryRepository(
                     return false
                 }
             } else {
-                com.forknews.utils.DiagnosticLogger.error("RepositoryRepository", "Релиз не получен для ${repository.owner}/${repository.name}")
+                com.forknews.utils.DiagnosticLogger.error("RepositoryRepository", "Релиз не получен для ${repository.owner}/${repository.name} - возможно проблемы с сетью или репозиторий не имеет релизов")
+                // НЕ обновляем БД при ошибке - оставляем старые данные
+                // Следующая проверка будет использовать те же старые данные для сравнения
             }
             
+            // Возвращаем false если не удалось получить релиз
             false
         } catch (e: Exception) {
             com.forknews.utils.DiagnosticLogger.error("RepositoryRepository", "Исключение в checkGitHubUpdate: ${e.message}", e)
